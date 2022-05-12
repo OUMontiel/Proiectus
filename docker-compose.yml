@@ -1,0 +1,12 @@
+version: '3.7'
+services:
+    server:
+        container_name: proiectus
+        build:
+            network: host
+            context: ./src
+            dockerfile: Dockerfile
+        ports:
+            - 8000:8000
+        volumes:
+            - ./src:/usr/src/app
