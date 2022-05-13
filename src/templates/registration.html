@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+    <div>
+        <form action="" method="post">
+            <label>First name:</label>
+            <input type="text" name="first-name"><br><br>
+            <label>Last name:</label>
+            <input type="text" name="last-name"><br><br>
+            <label>Username:</label>
+            <input type="email" name="username"><br><br>
+            <label>Password:</label>
+            <input type="password" name="password"><br><br>
+            <input type="submit" value="Register"><br><br><br><br>
+        </form>
+    </div>
+    <div>
+        <form action="/">
+            <input type="submit" value="Go back">
+        </form>
+    </div>
+{% endblock content %}
