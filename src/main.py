@@ -34,12 +34,31 @@ templates = Jinja2Templates(directory="templates")
 app.include_router(user)
 
 @app.get("/", response_class=HTMLResponse)
-def index(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+def index(request: Request, token: Union[str, None] = Cookie(default=None)):
+    user_id = None
+    try:
+        user_id = ObjectId(auth_handler.auth_wrapper(token))
+    except:
+        return templates.TemplateResponse("index.html", {"request": request})
+
+    if (db.user.find_one({"_id": user_id})):
+        return RedirectResponse("/dashboard")
+    else:
+        return templates.TemplateResponse("index.html", {"request": request})
+    
     
 @app.get("/register", response_class=HTMLResponse)
-def index(request: Request):
-    return templates.TemplateResponse("registration.html", {"request": request})
+def index(request: Request, token: Union[str, None] = Cookie(default=None)):
+    user_id = None
+    try:
+        user_id = ObjectId(auth_handler.auth_wrapper(token))
+    except:
+        return templates.TemplateResponse("registration.html", {"request": request})
+
+    if (db.user.find_one({"_id": user_id})):
+        return RedirectResponse("/dashboard")
+    else:
+        return templates.TemplateResponse("registration.html", {"request": request})
 
 @app.get("/dashboard", response_class=HTMLResponse)
 def index(request: Request, token: Union[str, None] = Cookie(default=None)):
@@ -56,8 +75,6 @@ def index(request: Request, token: Union[str, None] = Cookie(default=None)):
 
 
 '''
-user_id = Depends(auth_handler.auth_wrapper)
-
 @app.get("/example/{id}", response_class=HTMLResponse)
 def example(request: Request, id: str):
     return templates.TemplateResponse("example.html", {"request": request, "id": id})

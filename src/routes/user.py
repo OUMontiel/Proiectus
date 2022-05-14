@@ -1,7 +1,7 @@
 from bson import ObjectId
 from fastapi import APIRouter, Response, status, HTTPException
 from config.db import db
-from models.user import User
+from models.user import User, AuthDetails
 from passlib.hash import sha256_crypt
 from schemas.user import userEntity, usersEntity
 from starlette.status import HTTP_204_NO_CONTENT
@@ -40,21 +40,27 @@ async def create_user(user: User):
     
     id = db.user.insert_one(new_user).inserted_id
     token = auth_handler.encode_token(str(id))
-
     return { 'token': token }
 
 @user.post('/users/login')
-async def login_user(user: User):
+async def login_user(auth: AuthDetails):
+    auth = dict(auth)
     # Required fields
-    if (not user["email"] or not user["password"]):
+    if (not auth["email"] or not auth["password"]):
         raise HTTPException(status_code=400, detail="Missing fields.")
 
-    userDB = db.user.find_one({ "email": user["email"] })
-    if (not userDB or not auth_handler.verify_password(user["password"], userDB["password"])):
-        raise HTTPException(status_code=401, detail="Invalid email and/or password")
+    # Validate email
+    try:
+        auth["email"] = auth["email"].lower()
+        auth["email"] = validate_email(auth["email"]).email
+    except EmailNotValidError as e:
+        raise HTTPException(status_code=400, detail="Invalid email and/or password.")
+    
+    userDB = db.user.find_one({ "email": auth["email"] })
+    if (not userDB or not auth_handler.verify_password(auth["password"], userDB["password"])):
+        raise HTTPException(status_code=400, detail="Invalid email and/or password")
 
-    token = auth_handler.encode_token(userDB["id"])
-
+    token = auth_handler.encode_token(str(userDB["_id"]))
     return { 'token': token }
 
 @user.get('/users/{id}', response_model=User, tags=["users"])

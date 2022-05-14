@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
     <div>
-        <form action="/dashboard" method="post">
+        <form id="loginForm">
             <label for="email">Email:</label>
             <input type="email" name="email"><br><br>
             <label for="password">Password:</label>
@@ -12,7 +12,37 @@
     <div>
         <form action="/register">
             <label>Register here!</label>
-            <input type="submit" value="Register"><br><br><br><br>
+            <button type="submit">Register</button><br><br><br><br>
         </form>
     </div>
 {% endblock content %}
+{% block scripts %}
+<script>
+    let registerForm = document.getElementById('loginForm');
+    registerForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        inputs = e.target;
+        formFields = {
+            "email": inputs.email.value,
+            "password": inputs.password.value,
+        };
+
+        fetch('/users/login', {
+            method: 'POST',
+            body: JSON.stringify(formFields),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(res => res.json()).then(data => {
+            const d = new Date();
+            d.setTime(d.getTime() + (5*60*1000));
+            const expires = "expires="+ d.toUTCString();
+            
+            document.cookie = `token=${data.token}; ${expires}`;
+            location.assign('/dashboard');
+        }).catch((error) => {
+            console.error(error);
+        })
+    })
+</script>
+{% endblock %}

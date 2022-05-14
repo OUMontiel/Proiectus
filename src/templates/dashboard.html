@@ -4,9 +4,21 @@
         <h1>Log In Successful</h1><br><br><br><br>
     </div>
     <div>
-        <form action="/">
+        <form id="logout">
             <label>Log Out!</label>
-            <input type="submit" value="Log Out">
+            <button type="submit">Log Out</button>
         </form>
     </div>
 {% endblock content %}
+{% block scripts %}
+<script>
+    let registerForm = document.getElementById('logout');
+    registerForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        // Delete cookie
+        document.cookie = `token=; expires=Thu, 01 Jan 1970 00:00:00 UTC;`;
+        location.reload();
+    })
+</script>
+{% endblock %}
