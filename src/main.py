@@ -13,28 +13,29 @@ load_dotenv('.env')
 app = FastAPI()
 
 # TODO (Alam) Verificar si hacer la conexión aquí es seguro
-connection = connect(host=os.environ['MONGODB_URI'])
+# connection = connect(host=os.environ['MONGODB_URI'])
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
 
-@app.on_event("startup")
-async def create_db_client():
-    # Prueba de conexión a Mongo
-    print(get_db())
-    return
+# @app.on_event("startup")
+# async def create_db_client():
+#     # Prueba de conexión a Mongo
+#     print(get_db())
+#     return
 
 app.include_router(user)
 
-'''
 @app.get("/", response_class=HTMLResponse)
 def index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
-
+    
 @app.get("/register", response_class=HTMLResponse)
 def index(request: Request):
     return templates.TemplateResponse("registration.html", {"request": request})
+
+'''
 
 @app.get("/dashboard", response_class=HTMLResponse)
 def index(request: Request):

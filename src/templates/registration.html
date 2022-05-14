@@ -1,16 +1,22 @@
 {% extends "base.html" %}
 {% block content %}
     <div>
-        <form action="" method="post">
-            <label>First name:</label>
-            <input type="text" name="first-name"><br><br>
-            <label>Last name:</label>
-            <input type="text" name="last-name"><br><br>
-            <label>Username:</label>
-            <input type="email" name="username"><br><br>
-            <label>Password:</label>
+        <form id="registerForm" method="post">
+            <label for="first_name">First name:</label>
+            <input type="text" name="first_name"><br><br>
+            <label for="last_name">Last name:</label>
+            <input type="text" name="last_name"><br><br>
+            <label for="email">email:</label>
+            <input type="email" name="email"><br><br>
+            <label for="password">Password:</label>
             <input type="password" name="password"><br><br>
-            <input type="submit" value="Register"><br><br><br><br>
+            <label for="user_type">Register as: </label>
+            <select name="user_type">
+                <option value="student" selected>Student</option>
+                <option value="professor">Professor</option>                
+            </select>
+            <br><br>
+            <button type="submit">Register</button><br><br><br><br>
         </form>
     </div>
     <div>
@@ -19,3 +25,27 @@
         </form>
     </div>
 {% endblock content %}
+{% block scripts %}
+<script>
+    let registerForm = document.getElementById('registerForm');
+    registerForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        inputs = e.target;
+        formFields = {
+            "first_name": inputs.first_name.value,
+            "last_name": inputs.last_name.value,
+            "email": inputs.email.value,
+            "password": inputs.password.value,
+            "user_type": inputs.user_type.value
+        };
+
+        fetch('/users', {
+            method: 'POST',
+            body: JSON.stringify(formFields),
+            headers:{
+                'Content-Type': 'application/json'
+            }
+        }).then(res => res.json()).then(data => console.log(data))
+    })
+</script>
+{% endblock %}

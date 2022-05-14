@@ -2,11 +2,11 @@
 {% block content %}
     <div>
         <form action="/dashboard" method="post">
-            <label>Username:</label>
-            <input type="email" name="username"><br><br>
-            <label>Password:</label>
+            <label for="email">Email:</label>
+            <input type="email" name="email"><br><br>
+            <label for="password">Password:</label>
             <input type="password" name="password"><br><br>
-            <input type="submit" value="Log In"><br><br><br><br>
+            <button type="submit">Log In</button><br><br><br><br>
         </form>
     </div>
     <div>
