@@ -7,10 +7,12 @@ class UserTypeEnum(str, Enum):
     student = 'student'
     professor = 'professor'
 
-class User(BaseModel):
+class AuthDetails(BaseModel):
+    email: str
+    password: str
+
+class User(AuthDetails):
     id: Optional[str]
     first_name: str
     last_name: str
-    email: str
-    password: str
     user_type: UserTypeEnum

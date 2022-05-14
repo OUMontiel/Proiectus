@@ -6,17 +6,18 @@ from passlib.hash import sha256_crypt
 from schemas.user import userEntity, usersEntity
 from starlette.status import HTTP_204_NO_CONTENT
 from email_validator import validate_email, EmailNotValidError
+from utils.auth import AuthHandler
 
 user = APIRouter()
+auth_handler = AuthHandler()
 
 @user.get('/users', response_model=User, tags=["users"])
 def find_all_users():
     return usersEntity(db.user.find())
 
-@user.post('/users', response_model=User, tags=["users"])
+@user.post('/users/register')
 async def create_user(user: User):
     new_user = dict(user)
-
     # Required fields
     if (not new_user["first_name"] or not new_user["last_name"]
         or not new_user["email"] or not new_user["password"]
@@ -34,12 +35,27 @@ async def create_user(user: User):
     if db.user.find_one({"email": new_user["email"]}):
         raise HTTPException(status_code=400, detail="This email already exists")
 
-    new_user["password"] = sha256_crypt.encrypt(new_user["password"])
+    new_user["password"] = auth_handler.hash_password(new_user["password"])
     del new_user["id"]
     
     id = db.user.insert_one(new_user).inserted_id
-    user = db.user.find_one({"_id": id})
-    return userEntity(user)
+    token = auth_handler.encode_token(str(id))
+
+    return { 'token': token }
+
+@user.post('/users/login')
+async def login_user(user: User):
+    # Required fields
+    if (not user["email"] or not user["password"]):
+        raise HTTPException(status_code=400, detail="Missing fields.")
+
+    userDB = db.user.find_one({ "email": user["email"] })
+    if (not userDB or not auth_handler.verify_password(user["password"], userDB["password"])):
+        raise HTTPException(status_code=401, detail="Invalid email and/or password")
+
+    token = auth_handler.encode_token(userDB["id"])
+
+    return { 'token': token }
 
 @user.get('/users/{id}', response_model=User, tags=["users"])
 def find_user(id: str):

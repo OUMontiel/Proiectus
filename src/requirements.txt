@@ -19,6 +19,7 @@ orjson==3.6.8
 passlib==1.7.4
 pycodestyle==2.8.0
 pydantic==1.9.0
+PyJWT==2.4.0
 pymongo==4.1.1
 python-dotenv==0.20.0
 python-multipart==0.0.5
