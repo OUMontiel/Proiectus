@@ -35,7 +35,6 @@
 {% endblock content %}
 {% block scripts %}
 <script>
-
     let admin = document.querySelector('[name="admin"]')
     fetch('/users/' + admin.value)
         .then(response => response.json())
@@ -47,8 +46,7 @@
         fetch('/users/' + inputs_check[i].value)
             .then(response => response.json())
             .then(data => members.push(data));
-    }  
-
+    }
 
     let registerProjectForm = document.getElementById('registerProjectForm');
     registerProjectForm.addEventListener('submit', (e) => {
@@ -57,20 +55,19 @@
         inputs = e.target;
         
         let members_joined = []
-        let inputs_check =  document.querySelectorAll('.pl'); 
         for (var i = 0; i < inputs_check.length; i++) {   
             if (inputs_check[i].checked) {
-                members_joined.push(members[i])
+                let m = members.find(el => el.id == inputs_check[i].id)
+                members_joined.push(m)
             }
         }  
 
-        
         formFields = {
             "title": inputs.title.value,
             "description": inputs.description.value,
             "due_date": inputs.due_date.value,
             "admin": admin, 
-            "members": members
+            "members": members_joined
         };
 
         fetch('/projects/create', {

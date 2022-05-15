@@ -2,14 +2,12 @@
 {% block content %}
     <div>
         <h1>Log In Successful</h1><br><br><br>
-        {% if user.user_type == 'professor' %}
             <div>
                 <form id="project">
                     <label>Create Project?</label>
                     <button type="submit">Create Project</button>
                 </form>
             </div>
-        {% endif %}
         <br>
     </div>
     <div>
