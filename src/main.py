@@ -9,6 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from mongoengine import connect, get_db
 from routes.user import user
+from routes.project import project
 from typing import Union
 from utils.auth import AuthHandler
 
@@ -31,6 +32,7 @@ templates = Jinja2Templates(directory="templates")
 #     return
 
 app.include_router(user)
+app.include_router(project)
 
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request, token: Union[str, None] = Cookie(default=None)):
@@ -55,7 +57,7 @@ async def index(request: Request, token: Union[str, None] = Cookie(default=None)
     if not is_logged_in:
         return RedirectResponse("/")
 
-    return templates.TemplateResponse("dashboard.html", {"request": request})
+    return templates.TemplateResponse("dashboard.html", {"request": request, "user": is_logged_in})
 
 '''
 @app.get("/example/{id}", response_class=HTMLResponse)
