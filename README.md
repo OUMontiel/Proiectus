@@ -27,5 +27,5 @@ La aplicación comenzará a correr en `http://127.0.0.1:8000/`
 # Ejecución con Docker
 
 ```
-docker-compose -up
+docker-compose up -d
 ```
