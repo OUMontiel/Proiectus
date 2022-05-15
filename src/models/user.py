@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from pymongo.database import Database
 from typing import Optional
 from utils.auth import AuthHandler
+from fastapi import HTTPException
 
 class UserTypeEnum(str, Enum):
     student = 'student'

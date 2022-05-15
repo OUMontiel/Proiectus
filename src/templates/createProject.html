@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block content %}
+    <div>
+        <h1>Create Project</h1><br><br>
+        <form id="registerProjectForm" method="post">
+            <label for="title">Title:</label>
+            <input type="text" name="title"><br><br>
+
+            <label for="description">Description:</label>
+            <input type="text" name="description"><br><br>
+
+            <label for="due_date">Due_date:</label>
+            <input type="date" min="2022-05-15" name="due_date"><br><br>
+
+            <div style="display: none;">
+                <label for="admin">Admin:</label>
+                <input type="text" name="admin" value={{user._id}}><br><br>
+            </div>
+
+            <p>Members:</p>
+                {% for u in possible_users %}
+                 <input type="checkbox" id={{u.id}} class="pl" value={{u.id}}> {{u.first_name}} {{u.last_name}}
+                 <br>
+                {% endfor %}
+                
+            <br><br>
+            <button type="submit">Register</button><br><br><br><br>
+        </form>
+    </div>
+    <div>
+        <form action="/dashboard">
+            <input type="submit" value="Go back">
+        </form>
+    </div>
+{% endblock content %}
+{% block scripts %}
+<script>
+
+    let admin = document.querySelector('[name="admin"]')
+    fetch('/users/' + admin.value)
+        .then(response => response.json())
+        .then(data => admin = data);
+
+    let members = []
+    let inputs_check =  document.querySelectorAll('.pl'); 
+    for (var i = 0; i < inputs_check.length; i++) {   
+        fetch('/users/' + inputs_check[i].value)
+            .then(response => response.json())
+            .then(data => members.push(data));
+    }  
+
+
+    let registerProjectForm = document.getElementById('registerProjectForm');
+    registerProjectForm.addEventListener('submit', (e) => {
+        e.preventDefault(); 
+
+        inputs = e.target;
+        
+        let members_joined = []
+        let inputs_check =  document.querySelectorAll('.pl'); 
+        for (var i = 0; i < inputs_check.length; i++) {   
+            if (inputs_check[i].checked) {
+                members_joined.push(members[i])
+            }
+        }  
+
+        
+        formFields = {
+            "title": inputs.title.value,
+            "description": inputs.description.value,
+            "due_date": inputs.due_date.value,
+            "admin": admin, 
+            "members": members
+        };
+
+        fetch('/projects/create', {
+            method: 'POST',
+            body: JSON.stringify(formFields),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(res => res.json()).then(data => {
+            location.assign('/dashboard');
+        }).catch((error) => {
+            console.error(error);
+        })
+    })
+</script>
+{% endblock %}
