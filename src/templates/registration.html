@@ -1,33 +1,45 @@
 {% extends "base.html" %}
 {% block content %}
     <div>
-        <form id="loginForm">
-            <label for="email">Email:</label>
+        <form id="registerForm" method="post">
+            <label for="first_name">First name:</label>
+            <input type="text" name="first_name"><br><br>
+            <label for="last_name">Last name:</label>
+            <input type="text" name="last_name"><br><br>
+            <label for="email">email:</label>
             <input type="email" name="email"><br><br>
             <label for="password">Password:</label>
             <input type="password" name="password"><br><br>
-            <button type="submit">Log In</button><br><br><br><br>
+            <label for="user_type">Register as: </label>
+            <select name="user_type">
+                <option value="student" selected>Student</option>
+                <option value="professor">Professor</option>                
+            </select>
+            <br><br>
+            <button type="submit">Register</button><br><br><br><br>
         </form>
     </div>
     <div>
-        <form action="/register">
-            <label>Register here!</label>
-            <button type="submit">Register</button><br><br><br><br>
+        <form action="/">
+            <input type="submit" value="Go back">
         </form>
     </div>
 {% endblock content %}
 {% block scripts %}
 <script>
-    let registerForm = document.getElementById('loginForm');
+    let registerForm = document.getElementById('registerForm');
     registerForm.addEventListener('submit', (e) => {
         e.preventDefault();
         inputs = e.target;
         formFields = {
+            "first_name": inputs.first_name.value,
+            "last_name": inputs.last_name.value,
             "email": inputs.email.value,
             "password": inputs.password.value,
+            "user_type": inputs.user_type.value
         };
 
-        fetch('/users/login', {
+        fetch('/users/register', {
             method: 'POST',
             body: JSON.stringify(formFields),
             headers: {
