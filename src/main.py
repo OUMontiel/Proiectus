@@ -1,17 +1,16 @@
 import imp
-from fastapi import FastAPI, Request, Depends, Cookie
-from fastapi.responses import HTMLResponse
+import os
+
+from config.db import db
+from dotenv import load_dotenv
+from fastapi import FastAPI, Request, Cookie
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import RedirectResponse
-from dotenv import load_dotenv
 from mongoengine import connect, get_db
 from routes.user import user
-from config.db import db
-from utils.auth import AuthHandler
 from typing import Union
-from bson import ObjectId
-import os
+from utils.auth import AuthHandler
 
 load_dotenv('.env')
 
@@ -34,45 +33,29 @@ templates = Jinja2Templates(directory="templates")
 app.include_router(user)
 
 @app.get("/", response_class=HTMLResponse)
-def index(request: Request, token: Union[str, None] = Cookie(default=None)):
-    user_id = None
-    try:
-        user_id = ObjectId(auth_handler.auth_wrapper(token))
-    except:
-        return templates.TemplateResponse("index.html", {"request": request})
-
-    if (db.user.find_one({"_id": user_id})):
+async def index(request: Request, token: Union[str, None] = Cookie(default=None)):
+    is_logged_in = await auth_handler.auth_is_logged_in(db, token)
+    if is_logged_in:
         return RedirectResponse("/dashboard")
-    else:
-        return templates.TemplateResponse("index.html", {"request": request})
+    
+    return templates.TemplateResponse("index.html", {"request": request})
     
     
 @app.get("/register", response_class=HTMLResponse)
-def index(request: Request, token: Union[str, None] = Cookie(default=None)):
-    user_id = None
-    try:
-        user_id = ObjectId(auth_handler.auth_wrapper(token))
-    except:
-        return templates.TemplateResponse("registration.html", {"request": request})
-
-    if (db.user.find_one({"_id": user_id})):
+async def index(request: Request, token: Union[str, None] = Cookie(default=None)):
+    is_logged_in = await auth_handler.auth_is_logged_in(db, token)
+    if is_logged_in:
         return RedirectResponse("/dashboard")
-    else:
-        return templates.TemplateResponse("registration.html", {"request": request})
+
+    return templates.TemplateResponse("registration.html", {"request": request})
 
 @app.get("/dashboard", response_class=HTMLResponse)
-def index(request: Request, token: Union[str, None] = Cookie(default=None)):
-    user_id = None
-    try:
-        user_id = ObjectId(auth_handler.auth_wrapper(token))
-    except:
+async def index(request: Request, token: Union[str, None] = Cookie(default=None)):
+    is_logged_in = await auth_handler.auth_is_logged_in(db, token)
+    if not is_logged_in:
         return RedirectResponse("/")
 
-    if (db.user.find_one({"_id": user_id})):
-        return templates.TemplateResponse("dashboard.html", {"request": request})
-    else:
-        return RedirectResponse("/")
-
+    return templates.TemplateResponse("dashboard.html", {"request": request})
 
 '''
 @app.get("/example/{id}", response_class=HTMLResponse)

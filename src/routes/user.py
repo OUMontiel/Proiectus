@@ -1,78 +1,45 @@
 from bson import ObjectId
-from fastapi import APIRouter, Response, status, HTTPException
 from config.db import db
-from models.user import User, AuthDetails
-from passlib.hash import sha256_crypt
+from fastapi import APIRouter, Response, status
+from models.user import UserIn, UserOut, StudentCreator, ProfessorCreator, UserTypeEnum
 from schemas.user import userEntity, usersEntity
 from starlette.status import HTTP_204_NO_CONTENT
-from email_validator import validate_email, EmailNotValidError
-from utils.auth import AuthHandler
+from typing import List
+from utils.auth import AuthHandler, AuthDetails
 
 user = APIRouter()
 auth_handler = AuthHandler()
 
-@user.get('/users', response_model=User, tags=["users"])
-def find_all_users():
+@user.get('/users', response_model=List[UserOut])
+async def find_all_users():
     return usersEntity(db.user.find())
 
 @user.post('/users/register')
-async def create_user(user: User):
-    new_user = dict(user)
-    # Required fields
-    if (not new_user["first_name"] or not new_user["last_name"]
-        or not new_user["email"] or not new_user["password"]
-        or not new_user["user_type"]):
-        raise HTTPException(status_code=400, detail="Missing fields.")
-
-    # Validate email
-    try:
-        new_user["email"] = new_user["email"].lower()
-        new_user["email"] = validate_email(new_user["email"]).email
-    except EmailNotValidError as e:
-        raise HTTPException(status_code=400, detail="Email is not valid.")
-
-    # Check for duplicates
-    if db.user.find_one({"email": new_user["email"]}):
-        raise HTTPException(status_code=400, detail="This email already exists")
-
-    new_user["password"] = auth_handler.hash_password(new_user["password"])
-    del new_user["id"]
-    
-    id = db.user.insert_one(new_user).inserted_id
-    token = auth_handler.encode_token(str(id))
-    return { 'token': token }
+async def create_user(user: UserIn):
+    if (user.user_type == UserTypeEnum.professor):
+        factory = ProfessorCreator()
+        return await factory.registerUser(db, user)
+    else:
+        # Default is student
+        factory = StudentCreator()
+        return await factory.registerUser(db, user)
 
 @user.post('/users/login')
 async def login_user(auth: AuthDetails):
-    auth = dict(auth)
-    # Required fields
-    if (not auth["email"] or not auth["password"]):
-        raise HTTPException(status_code=400, detail="Missing fields.")
+    return await auth_handler.auth_login(db, auth)
 
-    # Validate email
-    try:
-        auth["email"] = auth["email"].lower()
-        auth["email"] = validate_email(auth["email"]).email
-    except EmailNotValidError as e:
-        raise HTTPException(status_code=400, detail="Invalid email and/or password.")
-    
-    userDB = db.user.find_one({ "email": auth["email"] })
-    if (not userDB or not auth_handler.verify_password(auth["password"], userDB["password"])):
-        raise HTTPException(status_code=400, detail="Invalid email and/or password")
-
-    token = auth_handler.encode_token(str(userDB["_id"]))
-    return { 'token': token }
-
-@user.get('/users/{id}', response_model=User, tags=["users"])
-def find_user(id: str):
+@user.get('/users/{id}', response_model=UserOut)
+async def find_user(id: str):
     return userEntity(db.user.find_one({"_id": ObjectId(id)}))
 
-@user.put('/users/{id}', response_model=User, tags=["users"])
-def update_user(id: str, user: User):
+# TODO Verify that it works
+@user.put('/users/{id}', response_model=UserIn, tags=["users"])
+def update_user(id: str, user: UserIn):
     db.user.find_one_and_update(
         {"_id": ObjectId(id)}, {"$set": dict(user)})
     return userEntity(db.user.find_one({"_id": ObjectId(id)}))
 
+# TODO Verify that it works
 @user.delete('/users/{id}', status_code=status.HTTP_204_NO_CONTENT, tags=["users"])
 def delete_user(id: str):
     userEntity(db.user.find_one_and_delete({"_id": ObjectId(id)}))

@@ -1,10 +1,17 @@
 import jwt
 import os
 
+from bson import ObjectId
+from datetime import datetime, timedelta
+from email_validator import validate_email, EmailNotValidError
 from fastapi import HTTPException
 from passlib.context import CryptContext
-from datetime import datetime, timedelta
 from pydantic import BaseModel
+from pymongo.database import Database
+
+class AuthDetails(BaseModel):
+    email: str
+    password: str
 
 class AuthHandler():
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -34,5 +41,30 @@ class AuthHandler():
         except jwt.InvalidTokenError as e:
             raise HTTPException(status_code=401, detail="Invalid token")
 
-    def auth_wrapper(self, token):
-        return self.decode_token(token)
+    async def auth_login(self, db: Database, auth: AuthDetails) -> dict:
+        # Required fields
+        if (not auth.email or not auth.password):
+            raise HTTPException(status_code=400, detail="Missing fields.")
+
+        # Validate email
+        try:
+            auth.email = auth.email.lower()
+            auth.email = validate_email(auth.email).email
+        except EmailNotValidError as e:
+            raise HTTPException(status_code=400, detail="Invalid email and/or password.")
+        
+        userDB = db.user.find_one({ "email": auth.email })
+        if (not userDB or not self.verify_password(auth.password, userDB["password"])):
+            raise HTTPException(status_code=400, detail="Invalid email and/or password")
+
+        token = self.encode_token(str(userDB["_id"]))
+        return { 'token': token }
+
+    async def auth_is_logged_in(self, db: Database, token: str) -> bool:
+        try:
+            user_id = ObjectId(self.decode_token(token))
+            return db.user.find_one({"_id": user_id})
+        except:
+            return False
+        
+        return False
