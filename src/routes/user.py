@@ -18,11 +18,11 @@ async def find_all_users():
 async def create_user(user: UserIn):
     if (user.user_type == UserTypeEnum.professor):
         factory = ProfessorCreator()
-        return await factory.registerUser(db, user)
+        return await factory.registerUser(db, dict(user))
     else:
         # Default is student
         factory = StudentCreator()
-        return await factory.registerUser(db, user)
+        return await factory.registerUser(db, dict(user))
 
 @user.post('/users/login')
 async def login_user(auth: AuthDetails):
