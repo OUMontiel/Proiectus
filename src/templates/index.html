@@ -34,12 +34,16 @@
                 'Content-Type': 'application/json'
             }
         }).then(res => res.json()).then(data => {
-            const d = new Date();
-            d.setTime(d.getTime() + (5*60*1000));
-            const expires = "expires="+ d.toUTCString();
-            
-            document.cookie = `token=${data.token}; ${expires}`;
-            location.assign('/dashboard');
+            if (data.token) {
+                const d = new Date();
+                d.setTime(d.getTime() + (5*60*1000));
+                const expires = "expires="+ d.toUTCString();
+                
+                document.cookie = `token=${data.token}; ${expires}`;
+                location.assign('/dashboard');
+            } else {
+                alert(data.detail)
+            }
         }).catch((error) => {
             console.error(error);
         })

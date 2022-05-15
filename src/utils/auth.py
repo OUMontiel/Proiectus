@@ -60,7 +60,7 @@ class AuthHandler():
         token = self.encode_token(str(userDB["_id"]))
         return { 'token': token }
 
-    async def auth_is_logged_in(self, db: Database, token: str) -> bool:
+    async def auth_is_logged_in(self, db: Database, token: str):
         try:
             user_id = ObjectId(self.decode_token(token))
             return db.user.find_one({"_id": user_id})
