@@ -7,6 +7,9 @@ from bson import ObjectId
 from config.db import db
 from models.user import UserModel
 from models.project import ProjectModel
+from schemas.project import projectEntity
+from models.notification import NotificationModel
+from schemas.notification import *
 
 
 class UsersController(ABC):
@@ -36,6 +39,9 @@ class UsersController(ABC):
 
     def get_project_memberships(self, id: str) -> List[ProjectModel]:
         return NotImplementedError()
+    
+    def get_user_notifications(self, id: str) -> List[NotificationModel]:
+        return NotImplementedError()
 
     @abstractmethod
     def decline_project_invitation(self, id: str) -> List[str]:
@@ -43,6 +49,10 @@ class UsersController(ABC):
 
     @abstractmethod
     def accept_project_invitation(self, id: str) -> List[str]:
+        pass
+
+    @abstractmethod
+    def update_notifications(self, id:str):
         pass
 
 
@@ -79,6 +89,13 @@ class PyMongoUsersController(UsersController):
             ProjectModel.from_mongo_doc, project_memberships)
         return list(project_memberships)
 
+    def get_user_notifications(self, id: str) -> List[NotificationModel]:
+        user_notifs = notificationsEntity(db.notifications.find(), id)
+        for notif in user_notifs:
+            print(notif)
+            db.notifications.find_one_and_update({"_id": ObjectId(notif['id'])}, {"$set": {'viewed': True}})
+        return user_notifs
+
     def decline_project_invitation(self, id: str) -> List[str]:
         return NotImplementedError()
 
@@ -92,3 +109,13 @@ class PyMongoUsersController(UsersController):
                 'invitees': id
             }
         })
+
+    def update_notifications(self, id, user_sending_id, project):
+        user_sending = self.get_user(user_sending_id)
+        desc = "{} se ha unido al proyecto {}".format(str(user_sending.first_name), str(project.title))
+        notification = NotificationModel(sent_by=user_sending_id,
+                                        received_by=id,
+                                        description=desc)
+        print(notification)
+        new_notification = db.notifications.insert_one(dict(notification))              
+

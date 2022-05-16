@@ -6,6 +6,9 @@ from bson import ObjectId
 from models.project import ProjectModel
 from config.db import db
 
+from controllers.user import PyMongoUsersController
+
+users_controller = PyMongoUsersController()
 
 class ProjectsController(ABC):
 
@@ -35,6 +38,10 @@ class ProjectsController(ABC):
 
     @abstractmethod
     def invite_to_project(self, id: str, invitees: List[str]) -> None:
+        return NotImplementedError()
+
+    @abstractmethod
+    def notify_all(self, id):
         return NotImplementedError()
 
 
@@ -82,3 +89,13 @@ class PyMongoProjectsController(ProjectsController):
         invitees = [str(invitee['_id']) for invitee in list(invitees)]
 
         self.invite_to_project(id, invitees)
+
+    # Observer method
+    def notify_all(self, u_id: str, project_id: str):
+        project = self.get_project(project_id)
+        member_ids = [str(member.id) for member in project.members]
+        print(member_ids)
+        for i in member_ids:
+            if i != u_id:
+                users_controller.update_notifications(i, u_id, project)
+        print("Finished sending notifications")

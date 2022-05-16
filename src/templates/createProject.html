@@ -78,7 +78,7 @@
                 'Content-Type': 'application/json'
             }
         }).then(res => res.json()).then(data => {
-            location.reload()
+            location.assign('/dashboard');
         }).catch((error) => {
             console.error(error);
         })

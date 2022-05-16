@@ -64,6 +64,7 @@ async def invite_to_project(id: str, invitees: List[str] = Body(...)):
 async def invite_to_project(request: Request, id: str):
     try:
         users_controller.accept_project_invitation(request.state.user.id, id)
+        projects_controller.notify_all(request.state.user.id, id)
         return Response(status_code=HTTP_204_NO_CONTENT)
     except Exception as e: 
         print(e)
