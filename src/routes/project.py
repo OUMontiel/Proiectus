@@ -22,8 +22,7 @@ auth_handler = AuthHandler()
 
 @project.get("/projects/create", response_class=HTMLResponse)
 async def index(request: Request, token: Union[str, None] = Cookie(default=None)):
-    if request.state.user.user_type != UserTypeEnum.professor:
-        return RedirectResponse("/dashboard")
+    # TODO Implement User GoToNewProject to Handle UserState
 
     return templates.TemplateResponse("createProject.html",
                                       {
