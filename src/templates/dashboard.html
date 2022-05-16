@@ -14,6 +14,12 @@
             <li>{{ project.title }}<a href="/projects/accept/{{project.id}}">Accept</a></li>
         {% endfor %}
         </ul>
+        <h2>My Notifications</h2>
+        <ul>
+        {% for notification in user_notifications %}
+            <li>{{ notification.description }}</li>
+        {% endfor %}
+        </ul>
             <div>
                 <form id="project">
                     <label>Create Project?</label>

@@ -10,6 +10,7 @@ from models.user import UserIn, StudentCreator, ProfessorCreator, UserTypeEnum, 
 from mongoengine import connect, get_db
 from routes.user import user
 from routes.project import project
+from routes.notification import notification
 from schemas.user import userEntity
 from utils.auth import AuthHandler
 
@@ -60,6 +61,7 @@ async def auth_middleware(request: Request, call_next):
 
 app.include_router(user)
 app.include_router(project)
+app.include_router(notification)
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -81,7 +83,7 @@ async def index(request: Request):
     if user.id:
         context['project_invitations'] = users_controller.get_project_invitations(user.id)
         context['project_membeships'] = users_controller.get_project_memberships(user.id)
-
+        context['user_notifications'] = users_controller.get_user_notifications(user.id)
     return user.goToDashboard(request, context)
 
 '''
