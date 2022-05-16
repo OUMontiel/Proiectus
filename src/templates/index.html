@@ -1,5 +1,37 @@
 {% extends "base.html" %}
 {% block content %}
+    <div class="container mt-5 mb-5 d-flex justify-content-center">
+        <div class="card px-1 py-4">
+            <div class="card-body">
+                <h2 class="card-title mb-3">Proiectus</h2>
+                <h6 class="information mt-4">Please enter your credentials:</h6>
+                <form id="loginForm">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <input class="form-control" type="email" placeholder="Email" name="email">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <input class="form-control" type="password" placeholder="Password" name="password">
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block confirm-button">Log In</button>
+                </form>
+                <form action="/register">
+                    <div class=" d-flex flex-column text-center px-5 mt-3 mb-3">
+                        <small class="agree-text">If you don´t have an account yet</small>
+                        <button class="btn btn-link" type="submit">Register</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--
     <div>
         <form id="loginForm">
             <label for="email">Email:</label>
@@ -15,6 +47,7 @@
             <button type="submit">Register</button><br><br><br><br>
         </form>
     </div>
+    -->
 {% endblock content %}
 {% block scripts %}
 <script>
