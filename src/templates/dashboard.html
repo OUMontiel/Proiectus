@@ -14,7 +14,6 @@
             <li>{{ project.title }}<a href="/projects/accept/{{project.id}}">Accept</a></li>
         {% endfor %}
         </ul>
-        {% if user.user_type == 'professor' %}
             <div>
                 <form id="project">
                     <label>Create Project?</label>
