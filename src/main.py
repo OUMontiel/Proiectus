@@ -1,7 +1,6 @@
-import imp
-import os
 
 from config.db import db
+from config.controllers import users_controller
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
@@ -32,6 +31,7 @@ templates = Jinja2Templates(directory="templates")
 #     print(get_db())
 #     return
 
+
 @app.middleware("http")
 async def auth_middleware(request: Request, call_next):
     # Default factory
@@ -41,14 +41,14 @@ async def auth_middleware(request: Request, call_next):
     is_logged_in = await auth_handler.auth_is_logged_in(db, token)
     if not is_logged_in:
         user = factory.createUser(dict(UserIn(
-            id = "", first_name="", last_name="",
+            id="", first_name="", last_name="",
             email="", password="",
             user_type=UserTypeEnum.student,
-        ))) 
-    
+        )))
+
         request.state.user = user
         return await call_next(request)
-    
+
     if is_logged_in["user_type"] == UserTypeEnum.professor:
         factory = ProfessorCreator()
 
@@ -61,21 +61,28 @@ async def auth_middleware(request: Request, call_next):
 app.include_router(user)
 app.include_router(project)
 
+
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
     user = request.state.user
     return user.goToHome(request)
-    
-    
+
+
 @app.get("/register", response_class=HTMLResponse)
 async def index(request: Request):
     user = request.state.user
     return user.goToRegister(request)
 
+
 @app.get("/dashboard", response_class=HTMLResponse)
 async def index(request: Request):
     user = request.state.user
-    return user.goToDashboard(request)
+    context = {}
+    if user.id:
+        context['project_invitations'] = users_controller.get_project_invitations(user.id)
+        context['project_membeships'] = users_controller.get_project_memberships(user.id)
+
+    return user.goToDashboard(request, context)
 
 '''
 @app.get("/example/{id}", response_class=HTMLResponse)

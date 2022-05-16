@@ -1,7 +1,20 @@
 {% extends "base.html" %}
 {% block content %}
     <div>
-        <h1>Log In Successful</h1><br><br><br>
+        <h1>Log In Successful</h1>
+        <h2>My Projects</h2>
+        <ul>
+        {% for project in project_membeships %}
+            <li><a href="/projects/{{project.id}}">{{ project.title }}</a></li>
+        {% endfor %}
+        </ul>
+        <h2>My Invitations</h2>
+        <ul>
+        {% for project in project_invitations %}
+            <li>{{ project.title }}<a href="/projects/accept/{{project.id}}">Accept</a></li>
+        {% endfor %}
+        </ul>
+        {% if user.user_type == 'professor' %}
             <div>
                 <form id="project">
                     <label>Create Project?</label>
@@ -22,7 +35,7 @@
     let registerForm = document.getElementById('logout');
     registerForm.addEventListener('submit', (e) => {
         e.preventDefault();
-
+        
         // Delete cookie
         document.cookie = `token=; expires=Thu, 01 Jan 1970 00:00:00 UTC;`;
         location.reload();

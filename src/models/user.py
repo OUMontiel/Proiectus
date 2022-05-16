@@ -70,8 +70,8 @@ class User(ABC):
     def goToRegister(self, request):
         return self._state.goToRegister(self._state, request)
 
-    def goToDashboard(self, request):
-        return self._state.goToDashboard(self._state, request)
+    def goToDashboard(self, request, context={}):
+        return self._state.goToDashboard(self._state, request, context)
 
     def goToNewProject(self, request):
         return self._state.goToNewProject(self._state, request)
@@ -160,8 +160,8 @@ class UserState(ABC):
         pass
 
     @abstractmethod
-    def goToDashboard(self, request):
-        pass
+    def goToDashboard(self, request, context={}):
+        return self.goToDefault(request)
 
     @abstractmethod
     def goToNewProject(self, request):
@@ -175,8 +175,8 @@ class LoggedInState(UserState):
     def goToRegister(self, request):
         return RedirectResponse("/dashboard")
 
-    def goToDashboard(self, request):
-        return templates.TemplateResponse("dashboard.html", { "request": request, "user": self._user })
+    def goToDashboard(self, request, context={}):
+        return templates.TemplateResponse("dashboard.html", {"request": request, "user": self._user, **context})
 
     def goToNewProject(self, request):
         pass
@@ -189,7 +189,7 @@ class LoggedOutState(UserState):
     def goToRegister(self, request):
         return templates.TemplateResponse("registration.html", { "request": request })
 
-    def goToDashboard(self, request):
+    def goToDashboard(self, request, context={}):
         return RedirectResponse("/")
 
     def goToNewProject(self, request):
