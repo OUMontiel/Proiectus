@@ -6,10 +6,11 @@ from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from pymongo.database import Database
-from typing import Optional
+from typing import Any, Optional
 from utils.auth import AuthHandler
 
 templates = Jinja2Templates(directory="templates")
+
 
 class UserTypeEnum(str, Enum):
     student = 'student'
@@ -18,13 +19,29 @@ class UserTypeEnum(str, Enum):
 # ---------------------------------
 # Pydantic Models (Types)
 # ---------------------------------
-
 class UserModel(BaseModel):
     id: Optional[str]
     first_name: str
     last_name: str
     email: str
     user_type: UserTypeEnum
+
+    class Config:
+        orm_mode = True
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+
+    @classmethod
+    def from_mongo_doc(cls, doc: Any) -> 'UserModel':
+        instance = UserModel(
+            id=str(doc['_id']),
+            first_name=doc['first_name'],
+            last_name=doc['last_name'],
+            email=doc['email'],
+            user_type=doc['user_type'],
+        )
+        return instance
+
 
 class UserIn(UserModel):
     password: str
