@@ -1,9 +1,7 @@
+from bson import ObjectId
 from pydantic import BaseModel
-from pymongo.database import Database
-from typing import Optional, List
-from utils.auth import AuthHandler
-from fastapi import HTTPException
-from models.user import User, UserModel
+from typing import Any, Optional, List
+from models.user import UserModel
 from datetime import date
 
 
@@ -14,4 +12,24 @@ class ProjectModel(BaseModel):
     due_date: date
     admin: UserModel
     members: List[UserModel]
+    invitees: List[str] = [] # Refs to User
+
+    class Config:
+        orm_mode = True
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+
+    @classmethod
+    def from_mongo_doc(cls, doc: Any) -> 'ProjectModel':
+        instance = ProjectModel(
+            id=str(doc['_id']),
+            title=doc['title'],
+            description=doc['description'],
+            due_date=doc['due_date'],
+            admin=doc['admin'],
+            members=doc['members'],
+            invitees=doc.get('invitees') or []
+        )
+        return instance
 

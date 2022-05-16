@@ -1,0 +1,63 @@
+{% extends "base.html" %} {% block content %}
+<div>
+    <h1>{{ project.title}}</h1>
+    <br />
+
+    <b>Due date:</b>
+    <p>{{project.due_date}}</p>
+
+    <b>Administrator:</b>
+    <p>{{'{} {}'.format(project.admin.first_name, project.admin.last_name)}}</p>
+
+    <b>Description:</b>
+    <p>{{project.description}}</p>
+
+    <b>Members</b>
+    <ul>
+        {% for member in project.members %}
+        <li>{{'{} {}'.format(member.first_name, member.last_name)}}</li>
+        {% endfor %}
+    </ul>
+    {% if user.user_type == 'professor' %}
+    <div>
+        <form id="invitations">
+            <label
+                >Invite members: (enter emails separated by spaces or
+                commas)</label
+            >
+            <input type="text" name="member_emails" />
+            <button type="submit">Invite</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+<div>
+    <form action="/dashboard">
+        <input type="submit" value="Go back" />
+    </form>
+</div>
+{% endblock content %} {% block scripts %}
+<script>
+    let inviteForm = document.getElementById('invitations');
+    inviteForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const invitees = e.target.member_emails.value.split(/[, ]+/);
+
+        fetch('/projects/invite/{{project.id}}', {
+            method: 'POST',
+            body: JSON.stringify(invitees),
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                // location.assign('/dashboard');
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    });
+</script>
+{% endblock %}
