@@ -18,7 +18,7 @@
         <li>{{'{} {}'.format(member.first_name, member.last_name)}}</li>
         {% endfor %}
     </ul>
-    {% if user.user_type == 'professor' %}
+    {% if user.id == project.admin.id %}
     <div>
         <form id="invitations">
             <label

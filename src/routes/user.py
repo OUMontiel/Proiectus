@@ -5,7 +5,8 @@ from models.user import UserIn, UserOut, StudentCreator, ProfessorCreator, UserT
 from schemas.user import userEntity, usersEntity
 from starlette.status import HTTP_204_NO_CONTENT
 from typing import List
-from utils.auth import AuthHandler, AuthDetails
+from models.user import UserBase
+from utils.auth import AuthHandler, UserAuth
 
 user = APIRouter(prefix='/users')
 auth_handler = AuthHandler()
@@ -15,7 +16,7 @@ async def find_all_users():
     return usersEntity(db.user.find())
 
 @user.post('/register')
-async def create_user(user: UserIn):
+async def create_user(user: UserBase):
     if (user.user_type == UserTypeEnum.professor):
         factory = ProfessorCreator()
         return await factory.registerUser(db, dict(user))
@@ -25,7 +26,7 @@ async def create_user(user: UserIn):
         return await factory.registerUser(db, dict(user))
 
 @user.post('/login')
-async def login_user(auth: AuthDetails):
+async def login_user(auth: UserAuth):
     return await auth_handler.auth_login(db, auth)
 
 @user.get('/{id}', response_model=UserOut)
@@ -33,8 +34,8 @@ async def find_user(id: str):
     return userEntity(db.user.find_one({"_id": ObjectId(id)}))
 
 # TODO Verify that it works
-@user.put('/{id}', response_model=UserIn, tags=["users"])
-def update_user(id: str, user: UserIn):
+@user.put('/{id}', response_model=UserBase, tags=["users"])
+def update_user(id: str, user: UserBase):
     db.user.find_one_and_update(
         {"_id": ObjectId(id)}, {"$set": dict(user)})
     return userEntity(db.user.find_one({"_id": ObjectId(id)}))

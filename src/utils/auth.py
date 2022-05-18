@@ -6,13 +6,14 @@ from datetime import datetime, timedelta
 from email_validator import validate_email, EmailNotValidError
 from fastapi import HTTPException
 from passlib.context import CryptContext
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from pymongo.database import Database
 
-class AuthDetails(BaseModel):
-    email: str
+class UserAuth(BaseModel):
+    '''Campos del usuario que son recibidos por autenticación (log in)'''
+    email: EmailStr
     password: str
-
+    
 class AuthHandler():
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
     secret = os.environ['SECRET_JWT']
@@ -41,7 +42,7 @@ class AuthHandler():
         except jwt.InvalidTokenError as e:
             raise HTTPException(status_code=401, detail="Invalid token")
 
-    async def auth_login(self, db: Database, auth: AuthDetails) -> dict:
+    async def auth_login(self, db: Database, auth: UserAuth) -> dict:
         # Required fields
         if (not auth.email or not auth.password):
             raise HTTPException(status_code=400, detail="Missing fields.")

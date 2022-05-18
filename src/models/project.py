@@ -1,17 +1,16 @@
 from bson import ObjectId
 from pydantic import BaseModel
 from typing import Any, Optional, List
-from models.user import UserModel
 from datetime import date
 
-
+from models.user import UserOut
 class ProjectModel(BaseModel):
     id: Optional[str]
     title: str
     description: str
     due_date: date
-    admin: UserModel
-    members: List[UserModel]
+    admin: UserOut
+    members: List[UserOut]
     invitees: List[str] = [] # Refs to User
 
     class Config:

@@ -58,7 +58,8 @@
         for (var i = 0; i < inputs_check.length; i++) {   
             if (inputs_check[i].checked) {
                 let m = members.find(el => el.id == inputs_check[i].id)
-                members_joined.push(m)
+                // TODO: no permitir crear hasta obtener todos los usuarios / obtener datos desde que se manda la forma del backend
+                if (m) members_joined.push(m)
             }
         }  
 

@@ -7,7 +7,7 @@ from schemas.project import projectEntity, projectsEntity
 from starlette.status import HTTP_204_NO_CONTENT
 from typing import List
 from config.controllers import projects_controller, users_controller
-from utils.auth import AuthHandler, AuthDetails
+from utils.auth import AuthHandler
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from typing import Union
 from fastapi.templating import Jinja2Templates
