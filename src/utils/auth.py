@@ -1,3 +1,4 @@
+from typing import Optional
 import jwt
 import os
 
@@ -6,13 +7,17 @@ from datetime import datetime, timedelta
 from email_validator import validate_email, EmailNotValidError
 from fastapi import HTTPException
 from passlib.context import CryptContext
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from pymongo.database import Database
 
-class AuthDetails(BaseModel):
-    email: str
-    password: str
+from config.controllers import users_controller
+from models.user import UserModel
 
+class UserAuth(BaseModel):
+    '''Campos del usuario que son recibidos por autenticación (log in)'''
+    email: EmailStr
+    password: str
+    
 class AuthHandler():
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
     secret = os.environ['SECRET_JWT']
@@ -41,7 +46,7 @@ class AuthHandler():
         except jwt.InvalidTokenError as e:
             raise HTTPException(status_code=401, detail="Invalid token")
 
-    async def auth_login(self, db: Database, auth: AuthDetails) -> dict:
+    async def auth_login(self, db: Database, auth: UserAuth) -> dict:
         # Required fields
         if (not auth.email or not auth.password):
             raise HTTPException(status_code=400, detail="Missing fields.")
@@ -60,11 +65,9 @@ class AuthHandler():
         token = self.encode_token(str(userDB["_id"]))
         return { 'token': token }
 
-    async def auth_is_logged_in(self, db: Database, token: str):
+    async def auth_is_logged_in(self, db: Database, token: str) -> Optional[UserModel]:
         try:
             user_id = ObjectId(self.decode_token(token))
-            return db.user.find_one({"_id": user_id})
+            return await users_controller.get_user(user_id)
         except:
             return False
-        
-        return False

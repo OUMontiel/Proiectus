@@ -18,7 +18,7 @@ def projectsEntity(entity) -> list:
 
 def projectEntityGet(item: ProjectModel) -> dict:
     return {
-        "id":  str(item["_id"]),
+        "id":  str(item.id),
         "title":  item.title,
         "description":  item.description,
         "due_date":  item.due_date,

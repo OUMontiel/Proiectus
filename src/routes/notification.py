@@ -2,7 +2,7 @@ from bson import ObjectId
 from config.db import db
 from fastapi import APIRouter, Response, status, Request, Cookie, Body
 from typing import List
-from utils.auth import AuthHandler, AuthDetails
+from utils.auth import AuthHandler
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from models.notification import NotificationModel

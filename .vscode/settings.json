@@ -1,0 +1,10 @@
+{
+    "python.linting.cwd": "${workspaceRoot}/src",
+    "python.testing.cwd": "${workspaceRoot}/src",
+    "python.autoComplete.extraPaths": [
+        "./src"
+    ],
+    "python.analysis.extraPaths": [
+        "./src"
+    ],
+}
