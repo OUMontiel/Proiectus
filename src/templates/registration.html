@@ -1,28 +1,60 @@
 {% extends "base.html" %}
 {% block content %}
-    <div>
-        <form id="registerForm" method="post">
-            <label for="first_name">First name:</label>
-            <input type="text" name="first_name"><br><br>
-            <label for="last_name">Last name:</label>
-            <input type="text" name="last_name"><br><br>
-            <label for="email">email:</label>
-            <input type="email" name="email"><br><br>
-            <label for="password">Password:</label>
-            <input type="password" name="password"><br><br>
-            <label for="user_type">Register as: </label>
-            <select name="user_type">
-                <option value="student" selected>Student</option>
-                <option value="professor">Professor</option>                
-            </select>
-            <br><br>
-            <button type="submit">Register</button><br><br><br><br>
-        </form>
-    </div>
-    <div>
-        <form action="/">
-            <input type="submit" value="Go back">
-        </form>
+    <div class="container mt-5 mb-5 d-flex justify-content-center">
+        <div class="card px-1 py-4">
+            <div class="card-body">
+                <h2 class="card-title mb-3" style="text-align: center;">Create Account</h2>
+                <h6 class="information mt-4">Please fill out with your information:</h6>
+                <form id="registerForm" method="post">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <input class="form-control" type="text" placeholder="First Name" name="first_name">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <input class="form-control" type="text" placeholder="Last Name" name="last_name">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <input class="form-control" type="email" placeholder="Email" name="email">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <input class="form-control" type="password" placeholder="Password" name="password">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label for="user_type" class="information mt-4">Register as: </label>
+                                <select name="user_type" class="form-control">
+                                    <option value="student" selected>Student</option>
+                                    <option value="professor">Professor</option>                
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block confirm-button">Register</button>
+                </form>
+                <form action="/">
+                    <div class=" d-flex flex-column text-center px-5 mt-3 mb-3">
+                        <small class="agree-text">Already have an account?</small>
+                        <button class="btn btn-link" type="submit">Log In</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 {% endblock content %}
 {% block scripts %}
