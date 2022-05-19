@@ -1,3 +1,4 @@
+from typing import Optional
 import jwt
 import os
 
@@ -8,6 +9,9 @@ from fastapi import HTTPException
 from passlib.context import CryptContext
 from pydantic import BaseModel, EmailStr
 from pymongo.database import Database
+
+from config.controllers import users_controller
+from models.user import UserModel
 
 class UserAuth(BaseModel):
     '''Campos del usuario que son recibidos por autenticación (log in)'''
@@ -61,11 +65,9 @@ class AuthHandler():
         token = self.encode_token(str(userDB["_id"]))
         return { 'token': token }
 
-    async def auth_is_logged_in(self, db: Database, token: str):
+    async def auth_is_logged_in(self, db: Database, token: str) -> Optional[UserModel]:
         try:
             user_id = ObjectId(self.decode_token(token))
-            return db.user.find_one({"_id": user_id})
+            return await users_controller.get_user(user_id)
         except:
             return False
-        
-        return False

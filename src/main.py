@@ -1,18 +1,21 @@
 
-from config.db import db
+from beanie import init_beanie
+from config.db import db, beanie_db
 from config.controllers import users_controller
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request, status
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from models.user import UserIn, StudentCreator, ProfessorCreator, UserTypeEnum, LoggedInState
+from models.project import ProjectModel
+from models.user import UserTypeEnum
 from mongoengine import connect, get_db
 from routes.user import user
 from routes.project import project
 from routes.notification import notification
 from schemas.user import userEntity
-from models.user import PlaceHolderUser, LoggedOutState
+from models.user import UserModel
+from utils.factories import PlaceHolderUser, StudentCreator, ProfessorCreator, LoggedInState, LoggedOutState
 from utils.auth import AuthHandler
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
@@ -30,17 +33,14 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
 
-# @app.on_event("startup")
-# async def create_db_client():
-#     # Prueba de conexión a Mongo
-#     print(get_db())
-#     return
+@app.on_event("startup")
+async def create_db_client():
+    await init_beanie(database=beanie_db, document_models=[UserModel, ProjectModel])
 
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     body = await request.json()
-    print(body)
     exc_str = f'{exc}'.replace('\n', ' ').replace('   ', ' ')
     logging.error(f"{request}: {exc_str}")
     content = {'status_code': 10422, 'message': exc_str, 'data': None}
@@ -58,10 +58,10 @@ async def auth_middleware(request: Request, call_next):
         request.state.user = PlaceHolderUser()
         return await call_next(request)
 
-    if is_logged_in["user_type"] == UserTypeEnum.professor:
+    if is_logged_in.user_type == UserTypeEnum.professor:
         factory = ProfessorCreator()
 
-    user = factory.createUser(userEntity(is_logged_in))
+    user = factory.createUser(is_logged_in)
     user.transition_to(LoggedInState)
     request.state.user = user
 
@@ -89,11 +89,11 @@ async def index(request: Request):
     user = request.state.user
     context = {}
     if user._state != LoggedOutState:
-        context['project_invitations'] = users_controller.get_project_invitations(
+        context['project_invitations'] = await users_controller.get_project_invitations(
             user.id)
-        context['project_membeships'] = users_controller.get_project_memberships(
+        context['project_membeships'] = await users_controller.get_project_memberships(
             user.id)
-        context['user_notifications'] = users_controller.get_user_notifications(
+        context['user_notifications'] = await users_controller.get_user_notifications(
             user.id)
     return user.goToDashboard(request, context)
 

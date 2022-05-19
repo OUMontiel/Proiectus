@@ -36,9 +36,9 @@
 {% block scripts %}
 <script>
     let admin = document.querySelector('[name="admin"]')
-    fetch('/users/' + admin.value)
-        .then(response => response.json())
-        .then(data => admin = data);
+    // fetch('/users/' + admin.value)
+    //     .then(response => response.json())
+    //     .then(data => admin = data);
 
     let members = []
     let inputs_check =  document.querySelectorAll('.pl'); 
@@ -59,7 +59,7 @@
             if (inputs_check[i].checked) {
                 let m = members.find(el => el.id == inputs_check[i].id)
                 // TODO: no permitir crear hasta obtener todos los usuarios / obtener datos desde que se manda la forma del backend
-                if (m) members_joined.push(m)
+                if (m) members_joined.push(m?.id)
             }
         }  
 
@@ -67,8 +67,8 @@
             "title": inputs.title.value,
             "description": inputs.description.value,
             "due_date": inputs.due_date.value,
-            "admin": admin, 
-            "members": [...members_joined, admin],
+            "admin": admin.value, 
+            "members": [...members_joined, admin.value],
             'invitees': []
         };
 

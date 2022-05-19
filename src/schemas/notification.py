@@ -3,11 +3,11 @@ from models.notification import NotificationModel
 
 def notificationEntity(item: NotificationModel) -> dict:
     return {
-        "id":  str(item["_id"]),
-        "sent_by":  item['sent_by'],
-        "received_by":  item['received_by'],
-        "description":  item["description"],
-        "viewed": item['viewed']
+        "id":  str(item.id),
+        "sent_by":  item.sent_by,
+        "received_by":  item.received_by,
+        "description":  item.description,
+        "viewed": item.viewed
     }
 
 
