@@ -21,6 +21,9 @@ class ProjectOut(ProjectIn):
     members: List[UserOut]
     invitees: List[UserOut]
 
+    class Config:
+        allow_population_by_field_name = True
+
 class ProjectModel(Document, ProjectOut):
     admin: Link[UserModel]
     members: List[Link[UserModel]]

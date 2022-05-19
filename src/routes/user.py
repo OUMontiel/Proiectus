@@ -14,7 +14,7 @@ from utils.auth import AuthHandler, UserAuth
 user = APIRouter(prefix='/users')
 auth_handler = AuthHandler()
 
-@user.get('/', response_model=List[UserOut])
+@user.get('/', response_model=List[UserOut], response_model_by_alias=False)
 async def find_all_users():
     return usersEntity(db.user.find())
 
@@ -32,12 +32,12 @@ async def create_user(user: UserIn):
 async def login_user(auth: UserAuth):
     return await auth_handler.auth_login(db, auth)
 
-@user.get('/{id}', response_model=UserOut)
+@user.get('/{id}', response_model=UserOut, response_model_by_alias=False)
 async def find_user(id: PydanticObjectId):
     return await UserModel.get(id)
 
 # TODO Verify that it works
-@user.put('/{id}', response_model=UserOut, tags=["users"])
+@user.put('/{id}', response_model=UserOut, tags=["users"], response_model_by_alias=False)
 async def update_user(id: PydanticObjectId, user: UserBase):
     user = await UserModel.find_one(UserModel.id == id).update({"$set": dict(user)})
     return user

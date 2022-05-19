@@ -25,7 +25,10 @@ auth_handler = AuthHandler()
 
 @project.get("/projects/create", response_class=HTMLResponse)
 async def index(request: Request, token: Union[str, None] = Cookie(default=None)):
-    possible_users = await UserModel.find(NotIn(UserModel.id, [ObjectId(request.state.user.id)]), fetch_links=True).project(UserOut).to_list()
+    possible_users = await UserModel\
+        .find(NotIn(UserModel.id, [ObjectId(request.state.user.id)]), fetch_links=True)\
+        .project(UserOut)\
+        .to_list()
 
     # TODO Implement User GoToNewProject to Handle UserState
     return templates.TemplateResponse("createProject.html",
@@ -38,8 +41,7 @@ async def index(request: Request, token: Union[str, None] = Cookie(default=None)
 
 @project.get('/projects/{id}', response_class=HTMLResponse)
 async def find_project(request: Request, id: PydanticObjectId):
-    project_data = await projects_controller.get_project(id)
-    project = ProjectOut.parse_obj(project_data.dict())
+    project = await projects_controller.get_project(id)
 
     return templates.TemplateResponse("project.html",
                                       {
