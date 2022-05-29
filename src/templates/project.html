@@ -12,6 +12,15 @@
     <b>Description:</b>
     <p>{{project.description}}</p>
 
+    <b>Project Tasks:</b>
+    
+    <br>
+    <div>
+        <form action="/projects/{{project.id}}/createTask">
+            <input type="submit" value="Create Task" />
+        </form>
+    </div>
+
     <b>Members</b>
     <ul>
         {% for member in project.members %}
