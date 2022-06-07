@@ -28,6 +28,7 @@ class ProjectModel(Document, ProjectOut):
     admin: Link[UserModel]
     members: List[Link[UserModel]]
     invitees: List[Link[UserModel]] = [] # Refs to User
+    tasks: List[Link[UserModel]] = [] # Refs to Tasks
 
     class Settings:
         name = 'projects'
