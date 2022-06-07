@@ -40,16 +40,3 @@ class ProjectModel(Document, ProjectOut):
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
 
-    @classmethod
-    def from_mongo_doc(cls, doc: Any) -> 'ProjectModel':
-        instance = ProjectModel(
-            id=str(doc['_id']),
-            title=doc['title'],
-            description=doc['description'],
-            due_date=doc['due_date'],
-            admin=doc['admin'],
-            members=doc['members'],
-            invitees=doc.get('invitees') or []
-        )
-        return instance
-
