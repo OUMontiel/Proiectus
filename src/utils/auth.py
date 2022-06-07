@@ -56,11 +56,11 @@ class AuthHandler():
             auth.email = auth.email.lower()
             auth.email = validate_email(auth.email).email
         except EmailNotValidError as e:
-            raise HTTPException(status_code=400, detail="Invalid email and/or password.")
+            raise HTTPException(status_code=401, detail="Invalid email and/or password.")
         
         userDB = db.user.find_one({ "email": auth.email })
         if (not userDB or not self.verify_password(auth.password, userDB["password"])):
-            raise HTTPException(status_code=400, detail="Invalid email and/or password")
+            raise HTTPException(status_code=401, detail="Invalid email and/or password")
 
         token = self.encode_token(str(userDB["_id"]))
         return { 'token': token }
