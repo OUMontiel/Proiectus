@@ -22,13 +22,13 @@ class TaskIn(BaseModel):
     due_date: date
     status: TaskStatus
     assignee: PydanticObjectId
-    project: PydanticObjectId
+    projectID: PydanticObjectId
 
 
 class TaskOut(TaskIn):
     id: PydanticObjectId = Field(alias='_id')
     assignee: UserOut
-    project: ProjectOut
+    projectID: ProjectOut
 
     class Config:
         allow_population_by_field_name = True
@@ -36,7 +36,7 @@ class TaskOut(TaskIn):
 
 class TaskModel(Document, TaskOut):
     assignee: Link[UserModel]
-    project: Link[ProjectModel]
+    projectID: Link[ProjectModel]
 
     class Settings:
         name = 'task'

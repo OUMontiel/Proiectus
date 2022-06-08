@@ -1,0 +1,32 @@
+{% extends "base.html" %} {% block content %}
+<div>
+    <h1>Task: {{ task.title}}</h1>
+    <br />
+
+    <b>Description:</b>
+    <p>{{task.description}}</p>
+
+    <b>Due date:</b>
+    <p>{{task.due_date | string()}}</p>
+
+    <b>Status:</b>
+    <p>{{task.status}}</p>
+
+    <b>Assignee:</b>
+    {% for user in users %}
+        {% if user.id == task.assignee.id %}
+            <p>{{'{} {}'.format(user.first_name, user.last_name)}}</p>
+        {% endif %}
+    {% endfor %}
+
+    <br>
+</div>
+<div>
+    <form action="/dashboard">
+        <input type="submit" value="Go back" />
+    </form>
+</div>
+{% endblock content %} {% block scripts %}
+<script>
+</script>
+{% endblock %}
