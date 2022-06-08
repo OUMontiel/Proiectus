@@ -59,6 +59,7 @@ class PyMongoProjectsController(ProjectsController):
         return NotImplementedError()
 
     async def create_project(self, data: ProjectIn) -> None:
+        print(data)
         admin = await UserModel.get(data.admin)
         assert admin is not None, f'Admin with id ({data.admin}) not found'
 
@@ -67,6 +68,7 @@ class PyMongoProjectsController(ProjectsController):
         project_values = data.dict()
         del project_values['admin']
         del project_values['members']
+        print(project_values)
 
         project = ProjectModel(
             **project_values, invitees=[], admin=admin, members=members)
@@ -114,5 +116,13 @@ class PyMongoProjectsController(ProjectsController):
         print(member_ids)
         for i in member_ids:
             if i != u_id:
-                users_controller.update_notifications(i, u_id, project)
+                print(i, u_id)
+
+                user_sending = await users_controller.get_user(u_id)
+                desc = "{} se ha unido al proyecto {}".format(
+                    str(user_sending.first_name), str(project.title))
+                print(desc)
+
+                await users_controller.update_notifications(i, u_id, desc)
+                
         print("Finished sending notifications")

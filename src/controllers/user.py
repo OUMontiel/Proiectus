@@ -107,12 +107,14 @@ class PyMongoUsersController(UsersController):
             }))
         
 
-    async def update_notifications(self, id, user_sending_id, project):
-        user_sending = await self.get_user(user_sending_id)
-        desc = "{} se ha unido al proyecto {}".format(
-            str(user_sending.first_name), str(project.title))
-        notification = NotificationModel(sent_by=user_sending_id,
-                                         received_by=id,
+    async def update_notifications(self, id, user_sending_id, desc):
+        print("Entered notifications")
+        sending_id = await self.get_user(user_sending_id)
+        receiving_id = await self.get_user(id)
+        print(sending_id, receiving_id)
+        notification = NotificationModel(
+                                         sent_by=sending_id,
+                                         received_by=receiving_id,
                                          description=desc)
         print(notification)
-        new_notification = db.notifications.insert_one(dict(notification))
+        await notification.create()
