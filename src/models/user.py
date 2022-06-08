@@ -33,14 +33,3 @@ class UserModel(Document, UserOut):
     password: str
     class Settings:
         name = 'user'
-
-    @classmethod
-    def from_mongo_doc(cls, doc: Any) -> 'UserModel':
-        instance = UserModel(
-            id=str(doc['_id']),
-            first_name=doc['first_name'],
-            last_name=doc['last_name'],
-            email=doc['email'],
-            user_type=doc['user_type'],
-        )
-        return instance

@@ -77,9 +77,9 @@ class PyMongoProjectsController(ProjectsController):
     async def delete_by_ids(self, ids: List[str]) -> None:
         return NotImplementedError()
 
-    async def update_project(self, id: str, data: ProjectModel) -> None:
-        db.projects.find_one_and_update(
-            {"_id": ObjectId(id)}, {"$set": dict(data)})
+    # TODO Test
+    async def update_project(self, id: PydanticObjectId, data: ProjectModel) -> None:
+        return await ProjectModel.find_one({ProjectModel.id: ObjectId(id)}).update({"$set": dict(data)})
 
     async def get_possible_invitees(self, id: PydanticObjectId) -> List[UserModel]:
         project = await ProjectModel.find_one(ProjectModel.id == id, fetch_links=True)

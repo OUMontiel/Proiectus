@@ -28,6 +28,7 @@ class ProjectModel(Document, ProjectOut):
     admin: Link[UserModel]
     members: List[Link[UserModel]]
     invitees: List[Link[UserModel]] = [] # Refs to User
+    tasks: List[Link[UserModel]] = [] # Refs to Tasks
 
     class Settings:
         name = 'projects'
@@ -39,17 +40,4 @@ class ProjectModel(Document, ProjectOut):
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
-
-    @classmethod
-    def from_mongo_doc(cls, doc: Any) -> 'ProjectModel':
-        instance = ProjectModel(
-            id=str(doc['_id']),
-            title=doc['title'],
-            description=doc['description'],
-            due_date=doc['due_date'],
-            admin=doc['admin'],
-            members=doc['members'],
-            invitees=doc.get('invitees') or []
-        )
-        return instance
 

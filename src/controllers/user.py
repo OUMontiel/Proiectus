@@ -29,11 +29,15 @@ class UsersController(ABC):
         return NotImplementedError()
 
     @abstractmethod
+    async def delete(self, id: PydanticObjectId) -> None:
+        return NotImplementedError()
+
+    @abstractmethod
     async def delete_by_ids(self, ids: List[str]) -> None:
         return NotImplementedError()
 
     @abstractmethod
-    async def update_user(self, id: str, data: UserModel) -> None:
+    async def update_user(self, id: str, data: UserBase) -> None:
         return NotImplementedError()
 
     async def get_project_invitations(self, id: str) -> List[ProjectModel]:
@@ -63,28 +67,36 @@ class PyMongoUsersController(UsersController):
     async def get_user(self, id: PydanticObjectId) -> UserModel:
         return await UserModel.get(id)
 
-    async def get_users_by_ids(self, ids: List[str]) -> List[UserModel]:
+    async def get_users_by_ids(self, ids: List[PydanticObjectId]) -> List[UserModel]:
         return NotImplementedError()
 
     async def create_user(self, data: UserBase) -> None:
         return NotImplementedError()
 
-    async def delete_by_ids(self, ids: List[str]) -> None:
+    async def delete(self, id: PydanticObjectId) -> None:
+        return await UserModel.find_one({UserModel.id: ObjectId(id)})\
+            .delete()
+
+    async def delete_by_ids(self, ids: List[PydanticObjectId]) -> None:
         return NotImplementedError()
 
-    async def update_user(self, id: str, data: UserModel) -> None:
-        db.user.find_one_and_update(
-            {"_id": ObjectId(id)}, {"$set": dict(data)})
+    async def update_user(self, id: PydanticObjectId, data: UserBase) -> None:
+        return await UserModel.find_one({UserModel.id: ObjectId(id)})\
+            .update({"$set": dict(data)})
 
     async def get_project_invitations(self, id: PydanticObjectId) -> List[ProjectModel]:
-        invited_projects = await ProjectModel.find(ProjectModel.invitees._id == ObjectId(id), fetch_links=True).to_list()
+        invited_projects = await ProjectModel\
+            .find(ProjectModel.invitees._id == ObjectId(id), fetch_links=True)\
+            .to_list()
         return invited_projects
 
     async def get_project_memberships(self, id: PydanticObjectId) -> List[ProjectModel]:
-        project_memberships = await ProjectModel.find(ProjectModel.members._id == ObjectId(id), fetch_links=True).to_list()
+        project_memberships = await ProjectModel\
+            .find(ProjectModel.members._id == ObjectId(id), fetch_links=True)\
+            .to_list()
         return project_memberships
 
-    async def get_user_notifications(self, id: str) -> List[NotificationModel]:
+    async def get_user_notifications(self, id: PydanticObjectId) -> List[NotificationModel]:
         user_notifs = notificationsEntity(db.notifications.find(), id)
         for notif in user_notifs:
             print(notif)
@@ -92,10 +104,10 @@ class PyMongoUsersController(UsersController):
                 {"_id": ObjectId(notif['id'])}, {"$set": {'viewed': True}})
         return user_notifs
 
-    async def decline_project_invitation(self, id: str) -> List[str]:
+    async def decline_project_invitation(self, id: PydanticObjectId) -> List[str]:
         return NotImplementedError()
 
-    async def accept_project_invitation(self, id: str, project_id: PydanticObjectId) -> List[str]:
+    async def accept_project_invitation(self, id: PydanticObjectId, project_id: PydanticObjectId) -> List[str]:
         user = await self.get_user(id)
         mod = await ProjectModel\
             .find_one(ProjectModel.id == ObjectId(project_id))\
@@ -105,7 +117,6 @@ class PyMongoUsersController(UsersController):
             .update(Pull({
                 'invitees': user.to_ref()
             }))
-        
 
     async def update_notifications(self, id, user_sending_id, desc):
         print("Entered notifications")
