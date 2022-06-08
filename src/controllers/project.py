@@ -129,3 +129,22 @@ class PyMongoProjectsController(ProjectsController):
         }).to_list()
 
         await self.invite_to_project(id, invitees)
+
+    async def add_feedback(self, id: PydanticObjectId, feedback: FeedbackIn) -> None:
+        project = await self.get_project(id)
+        assert project is not None, f'Project with id ({id}) was not found'
+
+        user = await UserModel.get(feedback.user)
+        assert user is not None, f'Project with id ({feedback.user}) was not found'
+
+        feedback = FeedbackModel(
+            project=project, content=feedback.content, user=user)
+
+        return await feedback.create()
+
+    async def get_feedback(self, id: PydanticObjectId) -> List[FeedbackModel]:
+        fb =  await FeedbackModel\
+            .find({FeedbackModel.project.id: ObjectId(id)}, fetch_links=True)\
+            .to_list()
+
+        return fb

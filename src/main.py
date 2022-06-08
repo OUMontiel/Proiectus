@@ -7,6 +7,7 @@ from fastapi import FastAPI, Request, status
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from models.feedback import FeedbackModel
 from models.project import ProjectModel
 from models.task import TaskModel
 from models.user import UserTypeEnum
@@ -37,7 +38,7 @@ templates = Jinja2Templates(directory="templates")
 
 @app.on_event("startup")
 async def create_db_client():
-    await init_beanie(database=beanie_db, document_models=[UserModel, ProjectModel, NotificationModel, TaskModel])
+    await init_beanie(database=beanie_db, document_models=[UserModel, ProjectModel, NotificationModel, TaskModel, FeedbackModel])
 
 
 #@app.exception_handler(RequestValidationError)

@@ -1,5 +1,5 @@
 {% extends "base.html" %} {% block content %}
-<div>
+<div class="container my-4 py-4">
     <h1>{{ project.title}}</h1>
     <br />
 
@@ -13,14 +13,13 @@
     <p>{{project.description}}</p>
 
     <b>Project Tasks:</b>
-    
-    <br>
+
+    <br />
     <div>
         <form id="task">
             <button type="submit">Create Task</button>
         </form>
     </div>
-
 
     <b>Members</b>
     <ul>
@@ -28,6 +27,18 @@
         <li>{{'{} {}'.format(member.first_name, member.last_name)}}</li>
         {% endfor %}
     </ul>
+    <b>Feedback</b>
+    {% for comment in feedback %}
+    <div class="card my-2 w-100">
+        <div class="card-header font-weight-bold small">
+            {{'{} {}'.format(comment.user.first_name, comment.user.last_name)}}
+        </div>
+        <div class="card-body py-2">
+            <p class="card-text">{{comment.content}}</p>
+            <h6 class="text-muted small">{{comment.date}}</h6>
+        </div>
+    </div>
+    {% endfor %}
     {% if user.id == project.admin.id %}
     <div>
         <form id="invitations">
@@ -39,17 +50,25 @@
             <button type="submit">Invite</button>
         </form>
     </div>
-    {% endif %}
-</div>
-<div>
-    <form action="/dashboard">
-        <input type="submit" value="Go back" />
+    {% endif %} {% if user.user_type == 'professor' %}
+    <form id="feedback" class="my-3">
+        <div class="mb-3">
+            <label for="feedback_input" class="form-label" >Submit feedback</label>
+            <textarea name="feedback_input" id="feedback_input" class="form-control"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" class="col-12">Submit</button>
     </form>
+    {% endif %}
+    <div>
+        <form action="/dashboard">
+            <input type="submit" value="Go back"  class="btn btn-secondary"/>
+        </form>
+    </div>
 </div>
 {% endblock content %} {% block scripts %}
 <script>
     let inviteForm = document.getElementById('invitations');
-    inviteForm.addEventListener('submit', (e) => {
+    inviteForm && inviteForm.addEventListener('submit', (e) => {
         e.preventDefault();
 
         const invitees = e.target.member_emails.value.split(/[, ]+/);
@@ -74,7 +93,35 @@
     projectRedirect.addEventListener('submit', (e) => {
         e.preventDefault();
 
-        location.assign("/projects/{{project.id}}/createTask");
+        location.assign('/projects/{{project.id}}/createTask');
+    });
+
+
+    $(document).ready(function() {
+        $('#feedback').submit((event) => {
+            event.preventDefault();
+
+            const payload = {
+                user: '{{user.id}}',
+                content: $('#feedback_input').val()
+            }
+
+            console.log(payload)
+            
+            fetch('/projects/{{project.id}}/feedback', {
+                method: 'POST',
+                body: JSON.stringify(payload),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+                .then(_ => location.reload())
+                .catch((error) => {
+                    console.error(error);
+                });
+            
+        });
     })
+   
 </script>
 {% endblock %}
