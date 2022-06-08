@@ -2,14 +2,27 @@ from beanie import Document
 from bson import ObjectId
 from pydantic import BaseModel
 from typing import Any, Optional, List
-from models.user import UserModel
+from models.user import UserModel, UserOut
 from datetime import date, datetime
+from beanie import Document, Link, PydanticObjectId
+
+class NotificationIn(BaseModel):
+    sent_by: PydanticObjectId
+    received_by: PydanticObjectId
+    description: str
+    viewed: bool = False
+
+class NotificationOut(BaseModel):
+    id: PydanticObjectId
+    sent_by: UserOut
+    received_by: UserOut
+    description: str
+    viewed: bool = False
 
 
-class NotificationModel(Document, BaseModel):
-    id: Optional[str]
-    sent_by: str
-    received_by: str
+class NotificationModel(Document, NotificationOut):
+    sent_by: Link[UserModel]
+    received_by: Link[UserModel]
     description: str
     viewed: bool = False
 

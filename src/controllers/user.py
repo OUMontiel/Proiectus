@@ -97,11 +97,12 @@ class PyMongoUsersController(UsersController):
         return project_memberships
 
     async def get_user_notifications(self, id: PydanticObjectId) -> List[NotificationModel]:
-        user_notifs = notificationsEntity(db.notifications.find(), id)
+        user_notifs = await NotificationModel\
+            .find(NotificationModel.received_by._id == ObjectId(id), NotificationModel.viewed == False, fetch_links=True)\
+            .to_list()
+        
         for notif in user_notifs:
-            print(notif)
-            db.notifications.find_one_and_update(
-                {"_id": ObjectId(notif['id'])}, {"$set": {'viewed': True}})
+            await notif.set({'viewed' : True})
         return user_notifs
 
     async def decline_project_invitation(self, id: PydanticObjectId) -> List[str]:
@@ -118,12 +119,11 @@ class PyMongoUsersController(UsersController):
                 'invitees': user.to_ref()
             }))
 
-    async def update_notifications(self, id, user_sending_id, project):
-        user_sending = await self.get_user(user_sending_id)
-        desc = "{} se ha unido al proyecto {}".format(
-            str(user_sending.first_name), str(project.title))
-        notification = NotificationModel(sent_by=user_sending_id,
-                                         received_by=id,
+    async def update_notifications(self, id, user_sending_id, desc):
+        print("Entered notifications")
+        sending_id = await self.get_user(user_sending_id)
+        receiving_id = await self.get_user(id)
+        notification = NotificationModel(sent_by=sending_id,
+                                         received_by=receiving_id,
                                          description=desc)
-        print(notification)
-        new_notification = db.notifications.insert_one(dict(notification))
+        await notification.create()
