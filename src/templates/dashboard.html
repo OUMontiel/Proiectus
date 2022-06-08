@@ -20,12 +20,20 @@
             <li>{{ notification.description }}</li>
         {% endfor %}
         </ul>
-            <div>
-                <form id="project">
-                    <label>Create Project?</label>
-                    <button type="submit">Create Project</button>
-                </form>
-            </div>
+        {% if user.user_type == 'student' %}
+        <div>
+            <form id="project">
+                <label>Create Project?</label>
+                <button type="submit">Create Project</button>
+            </form>
+        </div>
+        <div>
+            <form id="calendar">
+                <label>Check your calendar:</label>
+                <button type="submit">Go</button>
+            </form>
+        </div>
+        {% endif %}
         <br>
     </div>
     <div>
@@ -51,6 +59,13 @@
         e.preventDefault();
 
         location.assign("/projects/create");
+    })
+
+    let calendarRedirect = document.getElementById('calendar');
+    calendarRedirect.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        location.assign("/calendar");
     })
 
 </script>

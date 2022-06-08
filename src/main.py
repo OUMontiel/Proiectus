@@ -7,6 +7,7 @@ from fastapi import FastAPI, Request, status
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from models.feedback import FeedbackModel
 from models.project import ProjectModel
 from models.task import TaskModel
 from models.user import UserTypeEnum
@@ -14,6 +15,7 @@ from mongoengine import connect, get_db
 from routes.user import user
 from routes.project import project
 from routes.notification import notification
+from routes.calendar import calendar
 from schemas.user import userEntity
 from models.user import UserModel
 from models.notification import NotificationModel
@@ -37,7 +39,7 @@ templates = Jinja2Templates(directory="templates")
 
 @app.on_event("startup")
 async def create_db_client():
-    await init_beanie(database=beanie_db, document_models=[UserModel, ProjectModel, NotificationModel, TaskModel])
+    await init_beanie(database=beanie_db, document_models=[UserModel, ProjectModel, NotificationModel, TaskModel, FeedbackModel])
 
 
 #@app.exception_handler(RequestValidationError)
@@ -72,7 +74,7 @@ async def auth_middleware(request: Request, call_next):
 app.include_router(user)
 app.include_router(project)
 app.include_router(notification)
-
+app.include_router(calendar)
 
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
