@@ -1,0 +1,100 @@
+.calendar-container li {
+    list-style: none;
+}
+
+.calendar-container ul {
+    margin: 0;
+    padding: 0;
+}
+
+.calendar-container {
+    display: grid;
+    grid-template-columns: 50px auto;
+    grid-template-rows: auto;
+    gap: 1px 1px;
+    grid-template-areas: 
+        ". header"
+        "timeslots-container main";
+}
+
+.month {
+    display: flex;
+    justify-content: center;
+    position: relative;
+}
+
+.weekdays,
+.daynumbers {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+}
+
+.daynumbers {
+    min-height: 2em;
+}
+
+.weekdays {
+    background: lightblue;
+}
+
+.header {
+    background: gray;
+    grid-area: header;
+    text-align: center;
+}
+
+.timeslots-container {
+    background: lightgray;
+    grid-area: timeslots-container;
+    justify-content: left;
+}
+
+.timeslots {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.timeslots li {
+    min-height: 60px;
+}
+
+.timeslots li:after {
+    content: "";
+    position: absolute;
+    left: 10px;
+    width: 100%;
+    height: 1px;
+    background: lightgray;
+    z-index: 1;
+}
+
+.event-container {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);    
+    grid-template-rows: repeat(48, 1fr);
+    grid-area: main;
+    position: relative;
+}
+
+.slot {
+    position: absolute;
+    width: 13%;
+    background: darkslategray;
+    border-radius: 5px;
+    z-index: 5;
+    color: white;
+    font-size: 12px;
+}
+
+.slot-1 {
+    height: 30px;
+    grid-column: 1;
+    grid-row: 5;
+}
+
+.slot-2 {
+    height: 30px;
+    grid-column: 2;
+    grid-row: 5;
+}

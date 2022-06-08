@@ -1,0 +1,123 @@
+{% extends "base.html" %} {% block content %}
+<div>
+    <form action="/dashboard">
+        <input type="submit" value="Go back" />
+    </form>
+</div><br /><br />
+<div>
+    <form id="addAvailableTime" method="post">
+        <h2>Add available times:</h2>
+
+        <label for="start_time">Start time:</label>
+        <input type="datetime-local" id="start_time" name="start_time" step="1800"><br />
+
+        <label for="end_time">End time:</label>
+        <input type="datetime-local" id="end_time" name="end_time" step="1800"><br />
+
+        <button type="submit">Add</button><br /><br /><br /><br />
+    </form>
+</div>
+<div class="calendar-container">
+    <div class="header">
+        <div class="month">
+            <button>Previous</button>
+            <h1>May</h1>
+            <button>Next</button>
+        </div>
+
+        <ul class="weekdays">
+            <li>Sunday</li>
+            <li>Monday</li>
+            <li>Tuesday</li>
+            <li>Wednesday</li>
+            <li>Thursday</li>
+            <li>Friday</li>
+            <li>Saturday</li>
+        </ul>
+
+        <ul class="daynumbers">
+            <li>1</li>
+            <li>2</li>
+            <li>3</li>
+            <li>4</li>
+            <li>5</li>
+            <li>6</li>
+            <li>7</li>
+        </ul>
+    </div>
+    
+    <div class="timeslots-container">
+        <ul class="timeslots">
+            <li>12am</li>
+            <li>1am</li>
+            <li>2am</li>
+            <li>3am</li>
+            <li>4am</li>
+            <li>5am</li>
+            <li>6am</li>
+            <li>7am</li>
+            <li>8am</li>
+            <li>9am</li>
+            <li>10am</li>
+            <li>11am</li>
+            <li>12am</li>
+            <li>1pm</li>
+            <li>2pm</li>
+            <li>3pm</li>
+            <li>4pm</li>
+            <li>5pm</li>
+            <li>6pm</li>
+            <li>7pm</li>
+            <li>8pm</li>
+            <li>9pm</li>
+            <li>10pm</li>
+            <li>11pm</li>
+        </ul>
+    </div>
+
+    <div class="event-container">
+        <div class="slot slot-1">
+            <div class="event-status"></div>
+            <span>Event A</span>
+        </div>
+        <div class="slot slot-2">
+            <div class="event-status"></div>
+            <span>Event B</span>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+{% block scripts %}
+<script>
+    let admin = document.querySelector('[name="admin"]');
+    let inputs_check = [...document.querySelectorAll('.pl')];
+    let member_ids = inputs_check.map(input => input.value);
+
+    let addAvailableTime = document.getElementById('addAvailableTime');
+    addAvailableTime.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        inputs = e.target;
+
+        formFields = {
+            start_time: inputs.start_time.value,
+            end_time: inputs.end_time.value,
+        };
+
+        fetch('/calendar', {
+            method: 'POST',
+            body: JSON.stringify(formFields),
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                location.assign('/calendar');
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    });
+</script>
+{% endblock %}

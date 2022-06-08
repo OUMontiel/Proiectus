@@ -5,7 +5,8 @@ def userEntity(item) -> dict:
         "last_name":  item.last_name,
         "email":  item.email,
         "password":  item.password,
-        "user_type": item.user_type
+        "user_type": item.user_type,
+        "available_times": item.available_times
     }
 
 def usersEntity(entity) -> list:
