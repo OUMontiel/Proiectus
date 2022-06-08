@@ -4,6 +4,7 @@ from beanie.operators import NotIn
 from bson import ObjectId
 from config.db import db
 from fastapi import APIRouter, Response, status, Request, Cookie, Body
+from models.feedback import FeedbackIn
 from models.project import ProjectIn
 from models.task import TaskIn, TaskModel
 from models.user import UserModel, UserOut
@@ -40,12 +41,13 @@ async def index(request: Request, token: Union[str, None] = Cookie(default=None)
 @project.get('/{id}', response_class=HTMLResponse)
 async def find_project(request: Request, id: PydanticObjectId):
     project = await projects_controller.get_project(id)
-
+    feedback = await projects_controller.get_feedback(id)
     return templates.TemplateResponse("project.html",
                                       {
                                           "request": request,
                                           "user": request.state.user,
-                                          "project": project
+                                          "project": project,
+                                          "feedback": feedback
                                       })
 
 @project.get('/{id}/createTask', response_class=HTMLResponse)
@@ -84,6 +86,10 @@ async def accept_invite(request: Request, id: PydanticObjectId):
     await notifications_controller.notify_all(request.state.user.id, id)
     return Response(status_code=HTTP_204_NO_CONTENT)
 
+@project.post('/{id}/feedback')
+async def invite_to_project(id: PydanticObjectId, feedback: FeedbackIn = Body(...)):
+    await projects_controller.add_feedback(id, feedback)
+    return Response(status_code=HTTP_204_NO_CONTENT)
 
 # TODO Verify that it works
 @project.delete('/{id}', status_code=status.HTTP_204_NO_CONTENT, tags=["projects"])
