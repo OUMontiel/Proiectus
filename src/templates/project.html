@@ -12,6 +12,16 @@
     <b>Description:</b>
     <p>{{project.description}}</p>
 
+    <b>Project Tasks:</b>
+    
+    <br>
+    <div>
+        <form id="task">
+            <button type="submit">Create Task</button>
+        </form>
+    </div>
+
+
     <b>Members</b>
     <ul>
         {% for member in project.members %}
@@ -59,5 +69,12 @@
                 console.error(error);
             });
     });
+
+    let projectRedirect = document.getElementById('task');
+    projectRedirect.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        location.assign("/projects/{{project.id}}/createTask");
+    })
 </script>
 {% endblock %}
