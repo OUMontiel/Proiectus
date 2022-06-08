@@ -8,6 +8,9 @@
         <label for="description">Description:</label>
         <input type="text" name="description" /><br /><br />
 
+        <label for="due_date">Due_date:</label>
+        <input type="date" min="2022-05-15" name="due_date" /><br /><br />
+
         <div style="display: none">
             <label for="projectID">Project ID:</label>
             <input type="text" name="projectID" value="{{project.id}}" /><br /><br />
@@ -53,13 +56,22 @@
             }
         }
         */
+       /*
+            title: str
+            description: str
+            due_date: date
+            status: TaskStatus
+            assignee: PydanticObjectId
+            project: PydanticObjectId
+       */
 
         formFields = {
             title: inputs.title.value,
             description: inputs.description.value,
-            projectId: projectId.value,
+            due_date: inputs.due_date.value,
             status: status.value,
-            responsible: responsible.value,
+            assignee: assignee.value,
+            project: projectId.value,
         };
 
         fetch('/tasks/create', {

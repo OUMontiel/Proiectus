@@ -49,18 +49,8 @@ async def find_project(request: Request, id: PydanticObjectId):
                                           "project": project
                                       })
 
-@project.get('/projects/{id}/createTask', response_class=HTMLResponse)
-async def find_project(request: Request, id: PydanticObjectId):
-    project = await projects_controller.get_project(id)
-
-    return templates.TemplateResponse("createTask.html",
-                                      {
-                                          "request": request,
-                                          "user": request.state.user,
-                                          "project": project
-                                      })
-
 @project.post('/projects/create')
+@project.post('/create')
 async def create_project(project: ProjectIn = Body(...)):
     await projects_controller.create_project(project)
     return JSONResponse(status_code=status.HTTP_201_CREATED, content="Project created")

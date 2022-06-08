@@ -16,10 +16,11 @@
     
     <br>
     <div>
-        <form action="/projects/{{project.id}}/createTask">
-            <input type="submit" value="Create Task" />
+        <form id="task">
+            <button type="submit">Create Task</button>
         </form>
     </div>
+
 
     <b>Members</b>
     <ul>
@@ -68,5 +69,12 @@
                 console.error(error);
             });
     });
+
+    let projectRedirect = document.getElementById('task');
+    projectRedirect.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        location.assign("/task/create");
+    })
 </script>
 {% endblock %}
