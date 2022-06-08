@@ -1,0 +1,87 @@
+{% extends "base.html" %} {% block content %}
+<div>
+    <h1>Create Task for {{ project.title }}</h1>
+    <form id="registerTaskForm" method="post">
+        <label for="title">Title:</label>
+        <input type="text" name="title" /><br /><br />
+
+        <label for="description">Description:</label>
+        <input type="text" name="description" /><br /><br />
+
+        <label for="due_date">Due_date:</label>
+        <input type="date" min="2022-05-15" name="due_date" /><br /><br />
+
+        <div style="display: none">
+            <label for="projectID">Project ID:</label>
+            <input type="text" name="projectID" value="{{project.id}}" /><br /><br />
+        </div>
+
+        <div style="display: none">
+            <label for="status">Status:</label>
+            <input type="text" name="status" value="About to start" /><br /><br />
+        </div>
+
+        <p>Responsible:</p>
+        {% for member in project.members %}
+            <input type="radio" id="{{member.id}}" name="posible_responsible" value="{{member.id}}" class="pl">
+            <label for="{{member.id}}">{{member.first_name}} {{member.last_name}}</label><br>
+        {% endfor %}
+
+        <br /><br />
+        <button type="submit">Register</button><br /><br /><br /><br />
+    </form>
+</div>
+<div>
+    <form action="/projects/{{project.id}}">
+        <input type="submit" value="Go back" />
+    </form>
+</div>
+{% endblock content %} {% block scripts %}
+<script>
+    let assignee = document.querySelector('input[name=posible_responsible]');
+    let projectId = document.querySelector('[name="projectID"]');
+    let status = document.querySelector('[name="status"]');
+
+    let registerTaskForm = document.getElementById('registerTaskForm');
+    registerTaskForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        inputs = e.target;
+
+        console.log(assignee)
+
+        /*
+        for (var i = 0; i < inputs_check.length; i++) {
+            if (inputs_check[i].checked) {
+                let m = member_ids.find((id) => id == inputs_check[i].value);
+                if (m) members_joined.push(m);
+            }
+        }
+        */
+
+        formFields = {
+            title: inputs.title.value,
+            description: inputs.description.value,
+            due_date: inputs.due_date.value,
+            status: status.value,
+            assignee: assignee.value,
+            project: projectId.value,
+        };
+
+        fetch('/projects/createTask', {
+            method: 'POST',
+            body: JSON.stringify(formFields),
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                location.assign('/projects/{{project.id}}');
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    });
+</script>
+{% endblock %}

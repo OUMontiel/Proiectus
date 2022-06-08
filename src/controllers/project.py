@@ -11,6 +11,8 @@ from config.db import db
 from controllers.user import PyMongoUsersController
 from models.user import UserModel
 
+from models.task import TaskIn, TaskModel
+
 users_controller = PyMongoUsersController()
 
 
@@ -29,6 +31,10 @@ class ProjectsController(ABC):
         return NotImplementedError()
 
     @abstractmethod
+    async def create_task(self, data: TaskModel) -> None:
+        return NotImplementedError()
+
+    @abstractmethod
     async def delete_by_ids(self, ids: List[str]) -> None:
         return NotImplementedError()
 
@@ -44,10 +50,6 @@ class ProjectsController(ABC):
     async def invite_to_project(self, id: str, invitees: List[str]) -> None:
         return NotImplementedError()
 
-    @abstractmethod
-    async def notify_all(self, id):
-        return NotImplementedError()
-
 
 class PyMongoProjectsController(ProjectsController):
 
@@ -59,6 +61,7 @@ class PyMongoProjectsController(ProjectsController):
         return NotImplementedError()
 
     async def create_project(self, data: ProjectIn) -> None:
+        print(data)
         admin = await UserModel.get(data.admin)
         assert admin is not None, f'Admin with id ({data.admin}) not found'
 
@@ -67,10 +70,31 @@ class PyMongoProjectsController(ProjectsController):
         project_values = data.dict()
         del project_values['admin']
         del project_values['members']
+        print(project_values)
 
         project = ProjectModel(
-            **project_values, invitees=[], admin=admin, members=members)
+            **project_values, invitees=[], tasks=[], admin=admin, members=members)
         await project.create()
+
+    async def create_task(self, data: TaskIn) -> None:
+        assignee = await UserModel.get(data.assignee)
+        assert assignee is not None, f'assignee with id ({data.assignee}) not found'
+        print(assignee)
+
+        project = await ProjectModel.get(data.project)
+        assert project is not None, f'project with id ({data.project}) not found'
+        print(project)
+        #members = await UserModel.find_many(In(UserModel.id, data.members)).to_list()
+
+        task_values = data.dict()
+        del task_values['assignee']
+        del task_values['project']
+
+        print(task_values)
+
+        task = TaskModel(
+            **task_values, assignee=assignee, project=project)
+        await task.create()
 
     async def delete_by_ids(self, ids: List[str]) -> None:
         return NotImplementedError()
@@ -105,14 +129,3 @@ class PyMongoProjectsController(ProjectsController):
         }).to_list()
 
         await self.invite_to_project(id, invitees)
-
-    # Observer method
-
-    async def notify_all(self, u_id: str, project_id: str):
-        project = await self.get_project(project_id)
-        member_ids = [str(member.id) for member in project.members]
-        print(member_ids)
-        for i in member_ids:
-            if i != u_id:
-                users_controller.update_notifications(i, u_id, project)
-        print("Finished sending notifications")
