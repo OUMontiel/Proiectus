@@ -8,7 +8,7 @@ def taskEntity(item: TaskModel) -> dict:
         "description":  item.description,
         "due_date":  item.due_date,
         "status": item.status,
-        "asignee": item.asignee,
+        "assignee": item.assignee,
         "project": item.project
     }
 
@@ -23,6 +23,6 @@ def taskEntityGet(item: TaskModel) -> dict:
         "description":  item.description,
         "due_date":  item.due_date,
         "status": item.status,
-        "asignee": item.asignee,
+        "assignee": item.assignee,
         "project": item.project
     }

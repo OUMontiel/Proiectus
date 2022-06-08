@@ -8,6 +8,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from models.project import ProjectModel
+from models.task import TaskModel
 from models.user import UserTypeEnum
 from mongoengine import connect, get_db
 from routes.user import user
@@ -35,16 +36,16 @@ templates = Jinja2Templates(directory="templates")
 
 @app.on_event("startup")
 async def create_db_client():
-    await init_beanie(database=beanie_db, document_models=[UserModel, ProjectModel])
+    await init_beanie(database=beanie_db, document_models=[UserModel, ProjectModel, TaskModel])
 
 
-@app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request: Request, exc: RequestValidationError):
-    body = await request.json()
-    exc_str = f'{exc}'.replace('\n', ' ').replace('   ', ' ')
-    logging.error(f"{request}: {exc_str}")
-    content = {'status_code': 10422, 'message': exc_str, 'data': None}
-    return JSONResponse(content=content, status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
+#@app.exception_handler(RequestValidationError)
+#async def validation_exception_handler(request: Request, exc: RequestValidationError):
+#    body = await request.json()
+#    exc_str = f'{exc}'.replace('\n', ' ').replace('   ', ' ')
+#    logging.error(f"{request}: {exc_str}")
+#    content = {'status_code': 10422, 'message': exc_str, 'data': None}
+#    return JSONResponse(content=content, status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
 
 @app.middleware("http")

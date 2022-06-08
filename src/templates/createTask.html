@@ -18,7 +18,7 @@
 
         <div style="display: none">
             <label for="status">Status:</label>
-            <input type="text" name="status" value="Pending" /><br /><br />
+            <input type="text" name="status" value="About to start" /><br /><br />
         </div>
 
         <p>Responsible:</p>
@@ -38,7 +38,7 @@
 </div>
 {% endblock content %} {% block scripts %}
 <script>
-    let responsible = document.querySelector('input[name=posible_responsible]:checked');
+    let assignee = document.querySelector('input[name=posible_responsible]');
     let projectId = document.querySelector('[name="projectID"]');
     let status = document.querySelector('[name="status"]');
 
@@ -47,6 +47,8 @@
         e.preventDefault();
 
         inputs = e.target;
+
+        console.log(assignee)
 
         /*
         for (var i = 0; i < inputs_check.length; i++) {
@@ -60,12 +62,13 @@
         formFields = {
             title: inputs.title.value,
             description: inputs.description.value,
-            projectId: projectId.value,
+            due_date: inputs.due_date.value,
             status: status.value,
-            responsible: responsible.value,
+            assignee: assignee.value,
+            project: projectId.value,
         };
 
-        fetch('/tasks/create', {
+        fetch('/projects/createTask', {
             method: 'POST',
             body: JSON.stringify(formFields),
             headers: {

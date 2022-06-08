@@ -74,7 +74,7 @@
     projectRedirect.addEventListener('submit', (e) => {
         e.preventDefault();
 
-        location.assign("/task/create");
+        location.assign("/projects/{{project.id}}/createTask");
     })
 </script>
 {% endblock %}
