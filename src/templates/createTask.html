@@ -56,22 +56,13 @@
             }
         }
         */
-       /*
-            title: str
-            description: str
-            due_date: date
-            status: TaskStatus
-            assignee: PydanticObjectId
-            project: PydanticObjectId
-       */
 
         formFields = {
             title: inputs.title.value,
             description: inputs.description.value,
-            due_date: inputs.due_date.value,
+            projectId: projectId.value,
             status: status.value,
-            assignee: assignee.value,
-            project: projectId.value,
+            responsible: responsible.value,
         };
 
         fetch('/tasks/create', {
