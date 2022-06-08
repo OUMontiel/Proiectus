@@ -4,6 +4,7 @@ from beanie import PydanticObjectId
 from beanie.operators import In, NotIn, AddToSet
 
 from bson import ObjectId
+from models.feedback import FeedbackIn, FeedbackModel
 
 from models.project import ProjectIn, ProjectModel
 from config.db import db
