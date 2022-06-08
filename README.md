@@ -10,16 +10,22 @@ Agregar un archivo .env con los valores solicitados en el .env.sample (por ahora
 
 1. Instalar dependencias
 
-```
-cd src
-pip install requirements.txt
-```
+    ```
+    cd src
+    pip install requirements.txt
+    ```
 
 2. Ejecutar el servidor (desde la carpeta src)
 
-```
-uvicorn main:app --reload
-```
+    ```
+    uvicorn main:app --reload
+    ```
+
+    o 
+
+    ```
+    make dev
+    ```
 
 La aplicación comenzará a correr en `http://127.0.0.1:8000/`
 

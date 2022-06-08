@@ -2,6 +2,7 @@ from beanie import PydanticObjectId
 from bson import ObjectId
 import pydantic
 from config.db import db
+from config.controllers import users_controller
 from fastapi import APIRouter, Response, status
 from models.user import UserIn, UserModel, UserOut, UserTypeEnum
 from utils.factories import StudentCreator, ProfessorCreator
@@ -16,7 +17,7 @@ auth_handler = AuthHandler()
 
 @user.get('/', response_model=List[UserOut], response_model_by_alias=False)
 async def find_all_users():
-    return usersEntity(db.user.find())
+    return await UserModel.all().to_list()
 
 @user.post('/register')
 async def create_user(user: UserIn):
@@ -34,16 +35,16 @@ async def login_user(auth: UserAuth):
 
 @user.get('/{id}', response_model=UserOut, response_model_by_alias=False)
 async def find_user(id: PydanticObjectId):
-    return await UserModel.get(id)
+    return await users_controller.get_user(id)
 
 # TODO Verify that it works
 @user.put('/{id}', response_model=UserOut, tags=["users"], response_model_by_alias=False)
 async def update_user(id: PydanticObjectId, user: UserBase):
-    user = await UserModel.find_one(UserModel.id == id).update({"$set": dict(user)})
+    await users_controller.update_user(id, user)
     return user
 
 # TODO Verify that it works
 @user.delete('/{id}', status_code=status.HTTP_204_NO_CONTENT, tags=["users"])
-def delete_user(id: str):
-    userEntity(db.user.find_one_and_delete({"_id": ObjectId(id)}))
+async def delete_user(id: PydanticObjectId):
+    await users_controller.delete(id)
     return Response(status_code=HTTP_204_NO_CONTENT)
