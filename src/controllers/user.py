@@ -97,11 +97,12 @@ class PyMongoUsersController(UsersController):
         return project_memberships
 
     async def get_user_notifications(self, id: PydanticObjectId) -> List[NotificationModel]:
-        user_notifs = notificationsEntity(db.notifications.find(), id)
+        user_notifs = await NotificationModel\
+            .find(NotificationModel.received_by._id == ObjectId(id), NotificationModel.viewed == False, fetch_links=True)\
+            .to_list()
+        
         for notif in user_notifs:
-            print(notif)
-            db.notifications.find_one_and_update(
-                {"_id": ObjectId(notif['id'])}, {"$set": {'viewed': True}})
+            await notif.set({'viewed' : True})
         return user_notifs
 
     async def decline_project_invitation(self, id: PydanticObjectId) -> List[str]:
@@ -122,10 +123,7 @@ class PyMongoUsersController(UsersController):
         print("Entered notifications")
         sending_id = await self.get_user(user_sending_id)
         receiving_id = await self.get_user(id)
-        print(sending_id, receiving_id)
-        notification = NotificationModel(
-                                         sent_by=sending_id,
+        notification = NotificationModel(sent_by=sending_id,
                                          received_by=receiving_id,
                                          description=desc)
-        print(notification)
         await notification.create()

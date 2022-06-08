@@ -3,7 +3,7 @@ from bson import ObjectId
 from pydantic import BaseModel
 from typing import Any, Optional, List
 from models.user import UserModel, UserOut
-from datetime import date
+from datetime import date, datetime
 from beanie import Document, Link, PydanticObjectId
 
 class NotificationIn(BaseModel):

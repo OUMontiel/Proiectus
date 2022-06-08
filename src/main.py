@@ -15,6 +15,7 @@ from routes.project import project
 from routes.notification import notification
 from schemas.user import userEntity
 from models.user import UserModel
+from models.notification import NotificationModel
 from utils.factories import PlaceHolderUser, StudentCreator, ProfessorCreator, LoggedInState, LoggedOutState
 from utils.auth import AuthHandler
 from fastapi.exceptions import RequestValidationError
@@ -35,7 +36,7 @@ templates = Jinja2Templates(directory="templates")
 
 @app.on_event("startup")
 async def create_db_client():
-    await init_beanie(database=beanie_db, document_models=[UserModel, ProjectModel])
+    await init_beanie(database=beanie_db, document_models=[UserModel, ProjectModel, NotificationModel])
 
 
 @app.exception_handler(RequestValidationError)

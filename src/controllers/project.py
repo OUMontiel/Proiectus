@@ -110,17 +110,14 @@ class PyMongoProjectsController(ProjectsController):
 
     # Observer method
 
-    async def notify_all(self, u_id: str, project_id: str):
+    async def notify_all(self, u_id: str, project_id: str, *args):
         project = await self.get_project(project_id)
         member_ids = [str(member.id) for member in project.members]
-        print(member_ids)
         for i in member_ids:
-            if i != u_id:
-                print(i, u_id)
-
+            if str(i) != str(u_id):
                 user_sending = await users_controller.get_user(u_id)
-                desc = "{} se ha unido al proyecto {}".format(
-                    str(user_sending.first_name), str(project.title))
+                desc = "{} {} se ha unido al proyecto {}".format(
+                    str(user_sending.first_name), str(user_sending.last_name), str(project.title))
                 print(desc)
 
                 await users_controller.update_notifications(i, u_id, desc)
