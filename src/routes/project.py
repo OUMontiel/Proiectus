@@ -9,7 +9,7 @@ from models.user import UserModel, UserOut
 from schemas.project import projectEntity
 from starlette.status import HTTP_204_NO_CONTENT
 from typing import List
-from config.controllers import projects_controller, users_controller
+from config.controllers import projects_controller, users_controller, notifications_controller
 from utils.auth import AuthHandler
 from fastapi.responses import HTMLResponse, JSONResponse
 from typing import Union
@@ -64,7 +64,7 @@ async def invite_to_project(id: PydanticObjectId, invitees: List[str] = Body(...
 @project.get('/accept/{id}')
 async def accept_invite(request: Request, id: PydanticObjectId):
     await users_controller.accept_project_invitation(request.state.user.id, id)
-    await projects_controller.notify_all(request.state.user.id, id)
+    await notifications_controller.notify_all(request.state.user.id, id)
     return Response(status_code=HTTP_204_NO_CONTENT)
 
 
