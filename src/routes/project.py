@@ -40,12 +40,13 @@ async def index(request: Request, token: Union[str, None] = Cookie(default=None)
 @project.get('/{id}', response_class=HTMLResponse)
 async def find_project(request: Request, id: PydanticObjectId):
     project = await projects_controller.get_project(id)
-
+    tasks = await projects_controller.get_all_tasks()
     return templates.TemplateResponse("project.html",
                                       {
                                           "request": request,
                                           "user": request.state.user,
-                                          "project": project
+                                          "project": project,
+                                          "tasks": tasks
                                       })
 
 @project.get('/{id}/createTask', response_class=HTMLResponse)
@@ -57,6 +58,19 @@ async def find_project(request: Request, id: PydanticObjectId):
                                           "request": request,
                                           "user": request.state.user,
                                           "project": project
+                                      })
+
+@project.get('/task/{id}', response_class=HTMLResponse)
+async def find_project(request: Request, id: PydanticObjectId):
+    task = await projects_controller.get_task(id)
+    users = await projects_controller.get_all_users()
+
+    return templates.TemplateResponse("task.html",
+                                      {
+                                          "request": request,
+                                          "user": request.state.user,
+                                          "task": task,
+                                          "users": users
                                       })
 
 @project.post('/create')

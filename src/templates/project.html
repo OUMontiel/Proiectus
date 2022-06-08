@@ -13,8 +13,11 @@
     <p>{{project.description}}</p>
 
     <b>Project Tasks:</b>
-    
-    <br>
+    <ul>
+    {% for task in tasks %}
+        <li><a href="task/{{task.id}}">{{task.title}}</a></li>
+    {% endfor %}
+    </ul>
     <div>
         <form id="task">
             <button type="submit">Create Task</button>

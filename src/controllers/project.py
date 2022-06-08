@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from asyncio import tasks
 from typing import List
 from beanie import PydanticObjectId
 from beanie.operators import In, NotIn, AddToSet
@@ -11,7 +12,7 @@ from config.db import db
 from controllers.user import PyMongoUsersController
 from models.user import UserModel
 
-from models.task import TaskIn, TaskModel
+from models.task import TaskIn, TaskModel, TaskStatus
 
 users_controller = PyMongoUsersController()
 
@@ -32,6 +33,18 @@ class ProjectsController(ABC):
 
     @abstractmethod
     async def create_task(self, data: TaskModel) -> None:
+        return NotImplementedError()
+
+    @abstractmethod
+    async def get_task(self, id: str) -> TaskModel:
+        return NotImplementedError()
+
+    @abstractmethod
+    async def get_all_tasks(self) -> List[TaskModel]:
+        return NotImplementedError()
+
+    @abstractmethod
+    async def get_all_users(self) -> List[UserModel]:
         return NotImplementedError()
 
     @abstractmethod
@@ -81,20 +94,38 @@ class PyMongoProjectsController(ProjectsController):
         assert assignee is not None, f'assignee with id ({data.assignee}) not found'
         print(assignee)
 
-        project = await ProjectModel.get(data.project)
-        assert project is not None, f'project with id ({data.project}) not found'
-        print(project)
+        projectID = await ProjectModel.get(data.projectID)
+        assert projectID is not None, f'project with id ({data.projectID}) not found'
+        print(projectID)
         #members = await UserModel.find_many(In(UserModel.id, data.members)).to_list()
 
         task_values = data.dict()
         del task_values['assignee']
-        del task_values['project']
+        del task_values['projectID']
 
         print(task_values)
 
         task = TaskModel(
-            **task_values, assignee=assignee, project=project)
+            **task_values, assignee=assignee, projectID=projectID)
         await task.create()
+
+    async def get_task(self, id: str) -> TaskModel:
+        task = await TaskModel.get(ObjectId(id), fetch_links=True)
+        return task
+
+    async def get_all_tasks(self) -> List[TaskModel]:
+        emptyL = []
+        taskz = await TaskModel.find(
+            NotIn(TaskModel.id, emptyL)
+        ).to_list()
+        return taskz
+
+    async def get_all_users(self) -> List[UserModel]:
+        emptyL = []
+        userz = await UserModel.find(
+            NotIn(UserModel.id, emptyL)
+        ).to_list()
+        return userz
 
     async def delete_by_ids(self, ids: List[str]) -> None:
         return NotImplementedError()
