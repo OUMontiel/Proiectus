@@ -13,6 +13,7 @@ from mongoengine import connect, get_db
 from routes.user import user
 from routes.project import project
 from routes.notification import notification
+from routes.calendar import calendar
 from schemas.user import userEntity
 from models.user import UserModel
 from utils.factories import PlaceHolderUser, StudentCreator, ProfessorCreator, LoggedInState, LoggedOutState
@@ -70,7 +71,7 @@ async def auth_middleware(request: Request, call_next):
 app.include_router(user)
 app.include_router(project)
 app.include_router(notification)
-
+app.include_router(calendar)
 
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
